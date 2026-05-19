@@ -3,26 +3,28 @@
 Modal test: run verl's main_generation on a small model + tiny math dataset.
 
 Usage:
-    pip install modal
-    modal run modal_generation_test.py
-
-This spins up one Modal container with a single GPU, runs inference on 2 tiny
-math prompts using a 1.3B parameter model, and saves the generated answers.
+    # 1. Create a GitHub PAT (Settings -> Developer settings -> Personal access tokens)
+    # 2. Store it as a Modal Secret:
+    #    modal secret create github-token GITHUB_TOKEN=ghp_xxxxxxxx
+    # 3. Run:
+    #    modal run modal_generation_test.py
 """
 
 import modal
 import os
 
-# ---------------------------------------------------------------------------
-# 1. Define the remote image
-# ---------------------------------------------------------------------------
 app = modal.App("e3-generation-test")
+
+# Load the GitHub token from a Modal Secret (created via CLI ahead of time).
+# If running locally and the env var exists, fall back to that for convenience.
+if modal.is_local() and os.environ.get("GITHUB_TOKEN"):
+    github_secret = modal.Secret.from_dict({"GITHUB_TOKEN": os.environ["GITHUB_TOKEN"]})
+else:
+    github_secret = modal.Secret.from_name("github-token")
 
 image = (
     modal.Image.debian_slim(python_version="3.10")
-    # System deps for building flash-attn (optional) and general tooling
     .apt_install("git", "build-essential", "wget", "pkg-config")
-    # Core Python deps — pinned to match the project's Dockerfile
     .pip_install(
         "torch==2.6.0",
         "torchvision==0.21.0",
@@ -53,19 +55,13 @@ image = (
         "torchdata",
         "numpy",
         "omegaconf",
+        "flash-attn>=2.5.8",
     )
-    # Install the verl package from the local code (editable, inside the image)
-    .copy_local_dir(os.path.dirname(__file__), "/root/e3")
-    .run_commands("cd /root/e3 && pip install -e .")
 )
 
-# Persistent volume for model cache and outputs
-# (so repeated runs don't re-download the base model)
 vol = modal.Volume.from_name("e3-generation-vol", create_if_missing=True)
 
-# ---------------------------------------------------------------------------
-# 2. Helper: build a tiny test dataset
-# ---------------------------------------------------------------------------
+
 def _make_tiny_dataset() -> str:
     """Create a 2-row parquet of math prompts and return its path."""
     import pandas as pd
@@ -83,31 +79,34 @@ def _make_tiny_dataset() -> str:
     df.to_parquet(path, index=False)
     return path
 
-# ---------------------------------------------------------------------------
-# 3. Remote function — the actual generation job
-# ---------------------------------------------------------------------------
+
 @app.function(
     image=image,
-    gpu="A10g",               # cheapest GPU with enough VRAM for 1.3B model
-    # gpu="A100",             # upgrade here if you want faster / bigger models
-    gpu_count=1,              # single GPU is plenty for a 1.3B model
+    gpu="A10",
+    secrets=[github_secret],
     volumes={"/data": vol},
-    timeout=1800,             # 30 min — mostly model download on first run
+    timeout=1800,
 )
 def run_generation():
     import subprocess
     import os
 
-    # HuggingFace cache lives on the persistent volume
+    token = os.environ["GITHUB_TOKEN"]
+    repo_path = "/root/e3"
+
+    # Clone (and install) at runtime so the secret is available
+    if not os.path.exists(repo_path):
+        subprocess.run(
+            ["git", "clone", f"https://{token}@github.com/cfw20/cs224r-project-e3.git", repo_path],
+            check=True,
+        )
+        subprocess.run(["pip", "install", "-e", repo_path], check=True)
+
     os.environ["HF_HOME"] = "/data/hf_cache"
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-    # Build the tiny dataset
     data_path = _make_tiny_dataset()
     output_path = "/data/tiny_math_outputs.parquet"
-
-    # Choose a small model that fits comfortably on one GPU.
-    # deepseek-coder-1.3b-instruct is ~2.6 GB in bf16.
     model_path = "deepseek-ai/deepseek-coder-1.3b-instruct"
 
     cmd = [
@@ -133,9 +132,8 @@ def run_generation():
 
     print("Running command:")
     print(" ".join(cmd))
-    subprocess.run(cmd, cwd="/root/e3", check=True)
+    subprocess.run(cmd, cwd=repo_path, check=True)
 
-    # Read and print results
     import pandas as pd
     df = pd.read_parquet(output_path)
     print("\n=== Generated outputs ===")
@@ -143,12 +141,10 @@ def run_generation():
         print(f"\nPrompt {idx}: {row['prompt']}")
         print(f"Response: {row['responses']}")
 
-    vol.commit()  # flush writes to the persistent volume
+    vol.commit()
     return output_path
 
-# ---------------------------------------------------------------------------
-# 4. Local entrypoint — fires the remote job from your laptop
-# ---------------------------------------------------------------------------
+
 @app.local_entrypoint()
 def main():
     out_path = run_generation.remote()
