@@ -3,11 +3,7 @@
 Modal test: run verl's main_generation on a small model + tiny math dataset.
 
 Usage:
-    # 1. Create a GitHub PAT (Settings -> Developer settings -> Personal access tokens)
-    # 2. Store it as a Modal Secret:
-    #    modal secret create github-token GITHUB_TOKEN=ghp_xxxxxxxx
-    # 3. Run:
-    #    modal run modal_generation_test.py
+    modal run modal_generation_test.py
 """
 
 import modal
@@ -15,49 +11,8 @@ import os
 
 app = modal.App("e3-generation-test")
 
-# Load the GitHub token from a Modal Secret (created via CLI ahead of time).
-# If running locally and the env var exists, fall back to that for convenience.
-if modal.is_local() and os.environ.get("GITHUB_TOKEN"):
-    github_secret = modal.Secret.from_dict({"GITHUB_TOKEN": os.environ["GITHUB_TOKEN"]})
-else:
-    github_secret = modal.Secret.from_name("github-token")
+image = modal.Image.from_dockerfile("docker/Dockerfile.ngc.vllm0.8")
 
-image = (
-    modal.Image.debian_slim(python_version="3.10")
-    .apt_install("git", "build-essential", "wget", "pkg-config")
-    .pip_install(
-        "torch==2.6.0",
-        "torchvision==0.21.0",
-        "torchaudio==2.6.0",
-        "vllm==0.8.2",
-        "transformers>=4.49.0",
-        "accelerate",
-        "datasets",
-        "peft",
-        "hf-transfer",
-        "ray[default]",
-        "codetiming",
-        "hydra-core",
-        "pandas",
-        "pyarrow>=15.0.0",
-        "pylatexenc",
-        "qwen-vl-utils",
-        "wandb",
-        "dill",
-        "pybind11",
-        "liger-kernel",
-        "mathruler",
-        "pytest",
-        "yapf",
-        "py-spy",
-        "pyext",
-        "tensordict<=0.6.2",
-        "torchdata",
-        "numpy",
-        "omegaconf",
-        "flash-attn>=2.5.8",
-    )
-)
 
 vol = modal.Volume.from_name("e3-generation-vol", create_if_missing=True)
 
@@ -83,24 +38,12 @@ def _make_tiny_dataset() -> str:
 @app.function(
     image=image,
     gpu="A10",
-    secrets=[github_secret],
     volumes={"/data": vol},
     timeout=1800,
 )
 def run_generation():
     import subprocess
     import os
-
-    token = os.environ["GITHUB_TOKEN"]
-    repo_path = "/root/e3"
-
-    # Clone (and install) at runtime so the secret is available
-    if not os.path.exists(repo_path):
-        subprocess.run(
-            ["git", "clone", f"https://{token}@github.com/cfw20/cs224r-project-e3.git", repo_path],
-            check=True,
-        )
-        subprocess.run(["pip", "install", "-e", repo_path], check=True)
 
     os.environ["HF_HOME"] = "/data/hf_cache"
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -132,7 +75,7 @@ def run_generation():
 
     print("Running command:")
     print(" ".join(cmd))
-    subprocess.run(cmd, cwd=repo_path, check=True)
+    subprocess.run(cmd, check=True)
 
     import pandas as pd
     df = pd.read_parquet(output_path)
