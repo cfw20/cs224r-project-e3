@@ -38,6 +38,8 @@ cmd = [
     "rollout.gpu_memory_utilization=0.9",
     "rollout.enforce_eager=True",
     "data.batch_size=2",
+    "+rollout.extrapolation_val=False",
+    "+rollout.extrapolation_length=0",
 ]
 
 
