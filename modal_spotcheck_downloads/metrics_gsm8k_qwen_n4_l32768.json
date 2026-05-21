@@ -1,0 +1,12 @@
+{
+  "dataset": "gsm8k",
+  "model": "qwen",
+  "tag": "n4_l32768",
+  "scorer": "gsm8k_flexible",
+  "num_problems": 100,
+  "n_samples": 4,
+  "extract_failures": 0,
+  "pass@1_mean": 0.8975,
+  "pass@1": 0.8975,
+  "pass@4": 0.93
+}

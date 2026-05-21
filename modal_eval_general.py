@@ -434,7 +434,7 @@ def run_eval(
     output_path = os.path.join(
         DATA_DIR, f"{dataset}_{model}_{tag}_outputs.parquet"
     )
-    batch_size = min(n_problems, 8)
+    batch_size = min(n_problems, 24)
     _run_generation(
         data_path=data_path,
         output_path=output_path,
