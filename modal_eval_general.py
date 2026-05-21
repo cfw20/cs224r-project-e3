@@ -72,7 +72,7 @@ DATASETS = {
         "data_source":   "DigitalLearningGmbH/MATH-lighteval",
         "instruction":   "Let's think step by step and output the final answer within \\boxed{}.",
         "default_n_samples":       4,
-        "default_response_length": 8192,
+        "default_response_length": 32768,
         "scorer":        "curriculum_math",
     },
     "gsm8k": {
@@ -85,8 +85,8 @@ DATASETS = {
         "answer_extractor": "hash",
         "data_source":   "openai/gsm8k",
         "instruction":   'Let\'s think step by step and output the final answer after "####".',
-        "default_n_samples":       1,
-        "default_response_length": 1024,
+        "default_n_samples":       4,
+        "default_response_length": 32768,
         "scorer":        "gsm8k_flexible",
     },
 }
