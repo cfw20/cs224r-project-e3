@@ -82,7 +82,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.logger=['console','wandb'] \
     trainer.project_name="$WANDB_PROJECT" \
     trainer.experiment_name="$EXPERIMENT_NAME" \
-    trainer.val_before_train=False \
+    trainer.val_before_train=True \
     trainer.n_gpus_per_node=1 \
     trainer.nnodes=1 \
     trainer.save_freq="$SAVE_FREQ" \

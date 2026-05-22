@@ -80,13 +80,13 @@ def build_row(question_text: str, gt: str, split: str, idx: int, raw_answer: str
         "data_source": "openai/gsm8k",
         "prompt": [{"role": "user", "content": f"{question_text} {INSTRUCTION_FOLLOWING}"}],
         "ability": "math",
+        "level": "unknown",
         "reward_model": {"style": "rule", "ground_truth": gt},
         "extra_info": {
             "split": split,
             "index": idx,
             "answer": raw_answer,
             "question": raw_question,
-            "level": "unknown",
         },
     }
 
