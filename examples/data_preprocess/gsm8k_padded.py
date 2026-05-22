@@ -86,6 +86,7 @@ def build_row(question_text: str, gt: str, split: str, idx: int, raw_answer: str
             "index": idx,
             "answer": raw_answer,
             "question": raw_question,
+            "level": "unknown",
         },
     }
 
