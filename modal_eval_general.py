@@ -43,6 +43,9 @@ DATA_DIR = "/data/aime_eval"
 MODEL_IDS = {
     "qwen": "Qwen/Qwen3-1.7B",
     "e3": "CMU-AIRe/e3-1.7B",
+    # RLAD noise-control experiment checkpoints (written by modal_convert_ckpt.py)
+    "track_a": "/data/ckpts/qwen3-1p7b-gsm8k-grpo-clean_hf",
+    "track_b": "/data/ckpts/qwen3-1p7b-gsm8k-grpo-mixed_hf",
 }
 
 # Per-dataset configuration. See plan: modal-eval-general-9bf2a7.md
