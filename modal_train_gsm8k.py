@@ -46,7 +46,7 @@ TRACK_TO_EXP_NAME = {
 
 @app.function(
     image=image,
-    gpu="A100-80GB",
+    gpu="H100",
     volumes={"/data": vol},
     secrets=[modal.Secret.from_name("wandb-secret")],
     timeout=24 * 3600,
@@ -104,9 +104,9 @@ def run_train(track: str, total_steps: int, save_freq: int, test_freq: int):
 @app.local_entrypoint()
 def main(
     track: str = "a",
-    total_steps: int = 500,
+    total_steps: int = 400,
     save_freq: int = 100,
-    test_freq: int = 25,
+    test_freq: int = 100,
 ):
     print(f"[main] track={track} total_steps={total_steps} save_freq={save_freq} test_freq={test_freq}")
     result = run_train.remote(
