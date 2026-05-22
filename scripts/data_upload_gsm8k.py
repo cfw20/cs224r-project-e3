@@ -18,7 +18,7 @@ app = modal.App("rlad-noise-control-data-upload")
 image = (
     modal.Image.from_dockerfile("docker/Dockerfile.ngc.vllm0.8.noverl")
     .add_local_dir(".", "/root/e3", copy=True)
-    .run_commands("pip install -e /root/e3")
+    .run_commands("pip install -e /root/e3", "pip install seaborn")
 )
 
 vol = modal.Volume.from_name("e3-generation-vol", create_if_missing=True)
