@@ -1,0 +1,7 @@
+Metric,Track A (Clean),Track B (Mixed)
+Total Steps,243,400
+Final Validation Accuracy,0.8635,0.8817
+Mean Response Length (final),773.4,587.5
+Clip Ratio (final),26.6%,8.6%
+Avg Step Time (s),117.3,66.0
+Peak GPU Memory (GB),80.35,80.27
