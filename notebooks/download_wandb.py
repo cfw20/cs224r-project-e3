@@ -33,7 +33,22 @@ print(f"Selected Track B: {track_b_run.name if track_b_run else 'NOT FOUND'} (st
 if track_a_run and track_b_run:
     # Download histories
     print("\nDownloading Track A history...")
-    hist_a = track_a_run.history(samples=10000)
+    # Track A was resumed twice, so we combine the histories of the relevant runs to get the full 0-400 trajectory.
+    run_ids = ['go4zdpgb', 'a72jwsb8', 'fgw6prw4']
+    hist_a_list = []
+    for rid in run_ids:
+        try:
+            r_obj = api.run(f"{project}/{rid}")
+            h = r_obj.history(samples=10000)
+            hist_a_list.append(h)
+            print(f"  Loaded run {rid}: {len(h)} rows")
+        except Exception as e:
+            print(f"  Warning: failed to load run {rid}: {e}")
+    if hist_a_list:
+        hist_a = pd.concat(hist_a_list)
+        hist_a = hist_a.sort_values('_step').drop_duplicates(subset=['_step'], keep='last')
+    else:
+        hist_a = track_a_run.history(samples=10000)
     hist_a.to_csv('track_a_history.csv', index=False)
     print(f"Track A: {len(hist_a)} rows saved to track_a_history.csv")
     
