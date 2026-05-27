@@ -183,7 +183,7 @@ Both tracks for a given dataset use the same GRPO configuration (defined in a da
 
 | Parameter | GSM8K | Hendrycks MATH |
 |---|---|---|
-| `data.max_response_length` | 1024 | 3072 |
+| `data.max_response_length` | 1024 | 2048 |
 | `actor.ppo_max_token_len_per_gpu` | 16384 | 32768 |
 | `rollout.max_num_batched_tokens` | 16384 | 32768 |
 | Custom reward function | `gsm8k_custom.py` (strict) | Default `math.py` (boxed) |

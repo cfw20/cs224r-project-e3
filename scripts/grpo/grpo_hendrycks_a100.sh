@@ -3,7 +3,7 @@
 # Used by modal_train_hendrycks.py for both Track A (clean) and Track B (mixed).
 #
 # Differs from grpo_gsm8k_a100.sh in three places:
-#   - data.max_response_length: 1024 -> 3072  (Hendrycks needs longer reasoning)
+#   - data.max_response_length: 1024 -> 2048  (Hendrycks needs longer reasoning)
 #   - actor.ppo_max_token_len_per_gpu: 16384 -> 32768  (fit longer rollouts)
 #   - rollout.max_num_batched_tokens: 16384 -> 32768  (fit longer rollouts)
 #   - custom_reward_function.* dropped: rely on verl default routing for
@@ -48,7 +48,7 @@ python3 -m verl.trainer.main_ppo \
     data.val_files="$VAL_PARQUET" \
     data.train_batch_size=64 \
     data.max_prompt_length=512 \
-    data.max_response_length=3072 \
+    data.max_response_length=2048 \
     data.filter_overlong_prompts=True \
     data.truncation=error \
     actor_rollout_ref.model.path="$BASE_MODEL" \
@@ -75,7 +75,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.temperature=0.6 \
     actor_rollout_ref.rollout.val_kwargs.temperature=0.6 \
     actor_rollout_ref.rollout.val_kwargs.do_sample=True \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.7 \
     actor_rollout_ref.rollout.max_num_batched_tokens=32768 \
     actor_rollout_ref.rollout.n=8 \
     actor_rollout_ref.rollout.val_kwargs.n=4 \
