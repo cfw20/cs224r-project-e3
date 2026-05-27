@@ -32,7 +32,11 @@ app = modal.App("e3-eval-general")
 image = (
     modal.Image.from_dockerfile("docker/Dockerfile.ngc.vllm0.8.noverl")
     .add_local_dir(".", "/root/e3", copy=True)
-    .run_commands("pip install -e /root/e3", "pip install seaborn")
+    .run_commands(
+        "pip install -e /root/e3",
+        "pip install seaborn",
+        "pip install lm-eval",
+    )
 )
 
 vol = modal.Volume.from_name("e3-generation-vol", create_if_missing=True)
@@ -410,6 +414,7 @@ def run_eval(
     subset: str,
     split: str,
     output_tag: str,
+    use_lm_eval: bool,
 ):
     import os
 
@@ -423,6 +428,36 @@ def run_eval(
 
     model_id = MODEL_IDS[model]
     tag = output_tag or f"n{n_samples}_l{max_response_length}"
+
+    if use_lm_eval:
+        import lm_eval
+
+        if dataset != "gsm8k":
+            raise ValueError("--use-lm-eval currently only supports gsm8k")
+
+        print(f"[lm-eval] Running official gsm8k evaluation for {model_id}")
+        results = lm_eval.simple_evaluate(
+            model="vllm",
+            model_args=f"pretrained={model_id},trust_remote_code=True,tensor_parallel_size=1,gpu_memory_utilization=0.9",
+            tasks=["gsm8k"],
+            batch_size="auto",
+            device="cuda:0",
+        )
+
+        metrics = {
+            "dataset": dataset,
+            "model": model,
+            "tag": tag,
+            "scorer": "lm-eval-gsm8k",
+            "accuracy": float(results["results"]["gsm8k"]["acc"]),
+            "results_dict": results["results"],
+        }
+        print("\n=== lm-eval Summary ===")
+        for k, v in metrics.items():
+            print(f"  {k}: {v}")
+
+        vol.commit()
+        return metrics
 
     # 1. Prepare parquet
     data_path, n_problems = _prepare_dataset(
@@ -472,6 +507,7 @@ def main(
     subset: str = "all",
     split: str = "",
     output_tag: str = "",
+    use_lm_eval: bool = False,
 ):
     """Modal local entrypoint.
 
@@ -490,10 +526,11 @@ def main(
     split_v = split or cfg["default_split"]
     num_problems_v = None if num_problems is None or num_problems < 0 else int(num_problems)
 
+    mode = "lm-eval" if use_lm_eval else "custom"
     print(
         f"[main] dataset={dataset} model={model} n_samples={n_samples_v} "
         f"max_response_length={max_response_length_v} subset={subset} split={split_v} "
-        f"num_problems={num_problems_v} scorer={cfg['scorer']}"
+        f"num_problems={num_problems_v} scorer={cfg['scorer']} mode={mode}"
     )
 
     metrics = run_eval.remote(
@@ -506,6 +543,7 @@ def main(
         subset=subset,
         split=split_v,
         output_tag=output_tag,
+        use_lm_eval=use_lm_eval,
     )
     print("\nFinal metrics:")
     for k, v in metrics.items():
