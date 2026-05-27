@@ -444,12 +444,40 @@ def run_eval(
             device="cuda:0",
         )
 
+        import json
+        print("\n=== Raw lm-eval results['results'] ===")
+        print(json.dumps(results["results"], indent=2))
+
+        gsm8k_results = results["results"].get("gsm8k", {})
+
+        accuracy_key = None
+        for candidate in [
+            "exact_match,flexible-extract",
+            "exact_match,strict-match",
+            "exact_match",
+            "acc",
+        ]:
+            if candidate in gsm8k_results:
+                accuracy_key = candidate
+                break
+
+        if accuracy_key is None:
+            for k in gsm8k_results.keys():
+                if "exact_match" in k or "acc" in k:
+                    accuracy_key = k
+                    break
+
+        accuracy_val = (
+            float(gsm8k_results[accuracy_key]) if accuracy_key and accuracy_key in gsm8k_results else 0.0
+        )
+
         metrics = {
             "dataset": dataset,
             "model": model,
             "tag": tag,
             "scorer": "lm-eval-gsm8k",
-            "accuracy": float(results["results"]["gsm8k"]["exact_match"]),
+            "accuracy": accuracy_val,
+            "accuracy_metric_used": accuracy_key,
             "results_dict": results["results"],
         }
         print("\n=== lm-eval Summary ===")
