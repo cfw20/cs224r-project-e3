@@ -11,7 +11,7 @@
 #
 # Required env vars:
 #   TRAIN_PARQUET    absolute path to training parquet (clean or mixed)
-#   VAL_PARQUET      absolute path to clean Hendrycks MATH test parquet
+#   VAL_PARQUET      absolute path to MATH-500 validation parquet (500 problems)
 #   BASE_MODEL       HF id or local path to base model
 #   CKPT_DIR         absolute path under Modal Volume for checkpoints
 #   EXPERIMENT_NAME  wandb experiment name

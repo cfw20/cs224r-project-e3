@@ -51,6 +51,12 @@ def run_prepare(seed: int):
         print(f"[data_upload] running: {' '.join(cmd)}")
         subprocess.run(cmd, check=True, cwd=REPO_PATH)
 
+    # Overwrite test.parquet with the canonical MATH-500 validation set
+    math500_script = os.path.join(REPO_PATH, "examples/data_preprocess/math500_prep.py")
+    math500_cmd = ["python3", math500_script, "--local_dir", DATA_DIR, "--output_name", "test.parquet"]
+    print(f"[data_upload] running: {' '.join(math500_cmd)}")
+    subprocess.run(math500_cmd, check=True, cwd=REPO_PATH)
+
     print(f"[data_upload] listing {DATA_DIR}:")
     for name in sorted(os.listdir(DATA_DIR)):
         full = os.path.join(DATA_DIR, name)

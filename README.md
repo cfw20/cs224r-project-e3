@@ -83,7 +83,7 @@ Both tracks evaluate on the **same clean test split** (`test.parquet`, 1,319 row
 | **A (clean)** | `train_clean.parquet` | ~7,500 rows | Standard Hendrycks MATH train split. |
 | **B (mixed)** | `train_mixed.parquet` | ~15,000 rows | ~7,500 originals + ~7,500 copies with prepended trivia. |
 
-Both tracks evaluate on the **same clean test split** (`test.parquet`, ~5,000 rows).
+Both tracks evaluate on the **same clean validation split** (`test.parquet`, 500 rows from MATH-500).
 
 ### How the augmented dataset is created
 
@@ -184,6 +184,7 @@ Both tracks for a given dataset use the same GRPO configuration (defined in a da
 | Parameter | GSM8K | Hendrycks MATH |
 |---|---|---|
 | `data.max_response_length` | 1024 | 2048 |
+| `test_freq` / `val_freq` | every 100 steps | every 100 steps (calibrated for 500-problem MATH-500)
 | `actor.ppo_max_token_len_per_gpu` | 16384 | 32768 |
 | `rollout.max_num_batched_tokens` | 16384 | 32768 |
 | Custom reward function | `gsm8k_custom.py` (strict) | Default `math.py` (boxed) |
@@ -253,7 +254,7 @@ The Hendrycks MATH pipeline is structurally identical to the GSM8K pipeline, but
 modal run scripts/data_upload_hendrycks.py
 ```
 
-This runs `hendrycks_padded.py` twice (clean and mixed) and writes the parquets to `/data/hendrycks_math/` on the `e3-generation-vol` Volume.
+This runs `hendrycks_padded.py` twice (clean and mixed) to generate the training parquets, then `math500_prep.py` once to overwrite `test.parquet` with the canonical MATH-500 validation set (500 problems). All files are written to `/data/hendrycks_math/` on the `e3-generation-vol` Volume.
 
 #### Step 2: Train both tracks
 
