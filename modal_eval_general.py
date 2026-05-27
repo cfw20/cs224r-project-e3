@@ -449,7 +449,7 @@ def run_eval(
             "model": model,
             "tag": tag,
             "scorer": "lm-eval-gsm8k",
-            "accuracy": float(results["results"]["gsm8k"]["acc"]),
+            "accuracy": float(results["results"]["gsm8k"]["exact_match"]),
             "results_dict": results["results"],
         }
         print("\n=== lm-eval Summary ===")

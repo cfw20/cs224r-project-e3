@@ -15,8 +15,16 @@ def main(fsdp_checkpoint_path, huggingface_model_path, output_path, world_size):
         filepath = f"{fsdp_checkpoint_path}/model_world_size_{world_size}_rank_{rank}.pt"
         print('loading', filepath)
         this_state_dict = torch.load(filepath, weights_only=False)
+        # for key, value in this_state_dict.items():
+        #     state_dict[key].append(value.to_local())
+
         for key, value in this_state_dict.items():
-            state_dict[key].append(value.to_local())
+            if hasattr(value, "to_local"):
+                state_dict[key].append(value.to_local())
+            else:
+                state_dict[key].append(value)
+
+
 
     for key in state_dict:
         state_dict[key] = torch.cat(state_dict[key], dim=0)
