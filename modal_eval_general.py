@@ -92,7 +92,7 @@ DATASETS = {
         "data_source":   "HuggingFaceH4/MATH-500",
         "instruction":   "Let's think step by step and output the final answer within \\boxed{}.",
         "default_n_samples":       1,
-        "default_response_length": 32768,
+        "default_response_length": 2048,
         "scorer":        "math",
     },
     "gsm8k": {
