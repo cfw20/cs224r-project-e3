@@ -227,11 +227,11 @@ modal run modal_convert_ckpt.py --track a
 modal run modal_convert_ckpt.py --track b
 ```
 
-Then evaluate each converted checkpoint on the clean GSM8K test set:
+Then evaluate each converted checkpoint on the clean GSM8K test set using the industry-standard `lm-eval` package:
 
 ```bash
-modal run modal_eval_general.py --dataset gsm8k --model track_a
-modal run modal_eval_general.py --dataset gsm8k --model track_b
+modal run modal_eval_general.py --dataset gsm8k --model track_a --use-lm-eval
+modal run modal_eval_general.py --dataset gsm8k --model track_b --use-lm-eval
 ```
 
 #### Smoke test (2 steps)
