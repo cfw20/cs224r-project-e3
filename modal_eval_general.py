@@ -8,7 +8,7 @@ Usage:
     modal run modal_eval_general.py --dataset aime --model qwen
 
     # MATH-500 with e3
-    modal run modal_eval_general.py --dataset math --subset 500 --model e3 --n-samples 4
+    modal run modal_eval_general.py --dataset math --model e3
 
     # GSM8K full test set
     modal run modal_eval_general.py --dataset gsm8k --model qwen
@@ -45,11 +45,24 @@ REPO_PATH = "/root/e3"
 DATA_DIR = "/data/aime_eval"
 
 MODEL_IDS = {
-    "qwen": "Qwen/Qwen3-1.7B",
-    "e3": "CMU-AIRe/e3-1.7B",
-    # RLAD noise-control experiment checkpoints (written by modal_convert_ckpt.py)
-    "track_a": "/data/ckpts/qwen3-1p7b-gsm8k-grpo-clean_hf",
-    "track_b": "/data/ckpts/qwen3-1p7b-gsm8k-grpo-mixed_hf",
+    "qwen": {
+        "gsm8k": "Qwen/Qwen3-1.7B",
+        "math": "Qwen/Qwen3-1.7B",
+        "aime": "Qwen/Qwen3-1.7B",
+    },
+    "e3": {
+        "gsm8k": "CMU-AIRe/e3-1.7B",
+        "math": "CMU-AIRe/e3-1.7B",
+        "aime": "CMU-AIRe/e3-1.7B",
+    },
+    "track_a": {
+        "gsm8k": "/data/ckpts/qwen3-1p7b-gsm8k-grpo-clean_hf",
+        "math": "/data/ckpts/qwen3-1p7b-hendrycks-grpo-clean_hf",
+    },
+    "track_b": {
+        "gsm8k": "/data/ckpts/qwen3-1p7b-gsm8k-grpo-mixed_hf",
+        "math": "/data/ckpts/qwen3-1p7b-hendrycks-grpo-mixed_hf",
+    },
 }
 
 # Per-dataset configuration. See plan: modal-eval-general-9bf2a7.md
@@ -69,18 +82,18 @@ DATASETS = {
         "scorer":        "curriculum_math",
     },
     "math": {
-        "hf_id":         "DigitalLearningGmbH/MATH-lighteval",
+        "hf_id":         "HuggingFaceH4/MATH-500",
         "hf_config":     None,
         "default_split": "test",
         "competition":   None,
         "question_cols": ["problem"],
         "answer_cols":   ["solution"],
         "answer_extractor": "boxed",
-        "data_source":   "DigitalLearningGmbH/MATH-lighteval",
+        "data_source":   "HuggingFaceH4/MATH-500",
         "instruction":   "Let's think step by step and output the final answer within \\boxed{}.",
-        "default_n_samples":       4,
+        "default_n_samples":       1,
         "default_response_length": 32768,
-        "scorer":        "curriculum_math",
+        "scorer":        "math",
     },
     "gsm8k": {
         "hf_id":         "openai/gsm8k",
@@ -131,8 +144,8 @@ def _apply_math_subset(df, subset):
     if subset == "all":
         return df
     if subset == "500":
-        # Random-seeded 500-sample subset to approximate MATH-500
-        return df.sample(n=min(500, len(df)), random_state=42).reset_index(drop=True)
+        # MATH-500 is already exactly 500 problems; no sampling needed.
+        return df.reset_index(drop=True)
     if subset == "level5":
         if "level" not in df.columns:
             print(f"[data] WARNING: --subset level5 requested but no 'level' column; keeping all rows")
@@ -306,6 +319,20 @@ def _get_score_fn(cfg):
 
         return score_fn, extract_check
 
+    if scorer == "math":
+        from verl.utils.reward_score.math import compute_score
+
+        def score_fn(resp, gt):
+            return float(compute_score(
+                solution_str=resp,
+                ground_truth=str(gt),
+            ))
+
+        def extract_check(resp):
+            return "\\boxed" in resp
+
+        return score_fn, extract_check
+
     if scorer == "gsm8k_flexible":
         from verl.utils.reward_score.gsm8k import compute_score, extract_solution
 
@@ -426,7 +453,11 @@ def run_eval(
     if model not in MODEL_IDS:
         raise ValueError(f"Unknown --model={model!r}; choose from {list(MODEL_IDS)}")
 
-    model_id = MODEL_IDS[model]
+    dataset_models = MODEL_IDS[model]
+    if dataset not in dataset_models:
+        raise ValueError(f"Model {model!r} is not supported or defined for dataset {dataset!r}")
+
+    model_id = dataset_models[dataset]
     tag = output_tag or f"n{n_samples}_l{max_response_length}"
 
     if use_lm_eval:

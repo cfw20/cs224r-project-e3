@@ -30,7 +30,7 @@ The `modal_eval_general.py` script runs evaluation on a Modal GPU (A100-80GB) vi
 - Models: `qwen` (Qwen3-1.7B), `e3` (CMU-AIRe/e3-1.7B)
 
 **Performance notes**
-- Default `n_samples` is 4 for GSM8K/MATH and 16 for AIME.
+- Default `n_samples` is 4 for GSM8K, 1 for MATH, and 16 for AIME.
 - Default `max_response_length` is 32768 for all datasets.
 - Higher `n_samples` or longer responses increase runtime significantly on a single A100.
 
@@ -44,7 +44,7 @@ modal run modal_eval_general.py --dataset aime  --num-problems 2 --n-samples 2 -
 **Full evaluations**
 ```bash
 modal run modal_eval_general.py --dataset gsm8k --model qwen
-modal run modal_eval_general.py --dataset math  --model qwen --subset 500
+modal run modal_eval_general.py --dataset math  --model qwen
 modal run modal_eval_general.py --dataset aime  --model e3
 ```
 
@@ -273,8 +273,8 @@ Both use `scripts/grpo/grpo_hendrycks_a100.sh` with the longer response budgets 
 Convert checkpoints:
 
 ```bash
-modal run modal_convert_ckpt.py --track a
-modal run modal_convert_ckpt.py --track b
+modal run modal_convert_ckpt.py --track a --dataset math
+modal run modal_convert_ckpt.py --track b --dataset math
 ```
 
 Evaluate on the clean Hendrycks MATH test set:

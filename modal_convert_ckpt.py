@@ -30,8 +30,14 @@ CKPT_ROOT = "/data/ckpts"
 BASE_MODEL = "Qwen/Qwen3-1.7B"
 
 TRACK_TO_EXP_NAME = {
-    "a": "qwen3-1p7b-gsm8k-grpo-clean",
-    "b": "qwen3-1p7b-gsm8k-grpo-mixed",
+    "gsm8k": {
+        "a": "qwen3-1p7b-gsm8k-grpo-clean",
+        "b": "qwen3-1p7b-gsm8k-grpo-mixed",
+    },
+    "math": {
+        "a": "qwen3-1p7b-hendrycks-grpo-clean",
+        "b": "qwen3-1p7b-hendrycks-grpo-mixed",
+    }
 }
 
 
@@ -74,19 +80,23 @@ def _detect_world_size(actor_dir: str) -> int:
     volumes={"/data": vol},
     timeout=2 * 3600,
 )
-def run_convert(track: str, step: int):
+def run_convert(track: str, dataset: str, step: int):
     import os
     import subprocess
 
-    if track not in TRACK_TO_EXP_NAME:
-        raise ValueError(f"Unknown --track={track!r}; choose from {list(TRACK_TO_EXP_NAME)}")
+    if dataset not in TRACK_TO_EXP_NAME:
+        raise ValueError(f"Unknown --dataset={dataset!r}; choose from {list(TRACK_TO_EXP_NAME)}")
+
+    dataset_tracks = TRACK_TO_EXP_NAME[dataset]
+    if track not in dataset_tracks:
+        raise ValueError(f"Unknown --track={track!r} for dataset={dataset!r}; choose from {list(dataset_tracks)}")
 
     os.environ["HF_HOME"] = "/data/hf_cache"
 
-    exp_name = TRACK_TO_EXP_NAME[track]
+    exp_name = dataset_tracks[track]
     exp_dir = os.path.join(CKPT_ROOT, exp_name)
     if not os.path.isdir(exp_dir):
-        raise FileNotFoundError(f"No checkpoint dir for track {track}: {exp_dir}")
+        raise FileNotFoundError(f"No checkpoint dir for track {track} on dataset {dataset}: {exp_dir}")
 
     if step > 0:
         step_dir = os.path.join(exp_dir, f"global_step_{step}")
@@ -118,11 +128,11 @@ def run_convert(track: str, step: int):
     subprocess.run(cmd, check=True, cwd=REPO_PATH)
     vol.commit()
     print(f"[convert] HF model written to {output_path}")
-    return {"track": track, "step_dir": step_dir, "hf_path": output_path}
+    return {"track": track, "dataset": dataset, "step_dir": step_dir, "hf_path": output_path}
 
 
 @app.local_entrypoint()
-def main(track: str = "a", step: int = -1):
+def main(track: str = "a", dataset: str = "gsm8k", step: int = -1):
     """--step=-1 means latest available global_step_* dir."""
-    result = run_convert.remote(track=track, step=step)
+    result = run_convert.remote(track=track, dataset=dataset, step=step)
     print(f"[main] done: {result}")
