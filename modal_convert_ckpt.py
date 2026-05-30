@@ -11,6 +11,9 @@ Usage:
     modal run modal_convert_ckpt.py --track a
     modal run modal_convert_ckpt.py --track b
     modal run modal_convert_ckpt.py --track a --step 500   # explicit step
+
+    # Convert any experiment directly by name (e.g. e3 curriculum stages):
+    modal run modal_convert_ckpt.py --exp-name qwen3-1p7b-gsm8k-e3-clean-stage1
 """
 
 import modal
@@ -80,20 +83,21 @@ def _detect_world_size(actor_dir: str) -> int:
     volumes={"/data": vol},
     timeout=2 * 3600,
 )
-def run_convert(track: str, dataset: str, step: int):
+def run_convert(track: str, dataset: str, step: int, exp_name: str):
     import os
     import subprocess
 
-    if dataset not in TRACK_TO_EXP_NAME:
-        raise ValueError(f"Unknown --dataset={dataset!r}; choose from {list(TRACK_TO_EXP_NAME)}")
-
-    dataset_tracks = TRACK_TO_EXP_NAME[dataset]
-    if track not in dataset_tracks:
-        raise ValueError(f"Unknown --track={track!r} for dataset={dataset!r}; choose from {list(dataset_tracks)}")
-
     os.environ["HF_HOME"] = "/data/hf_cache"
 
-    exp_name = dataset_tracks[track]
+    # --exp-name takes precedence and bypasses the track table (used for e3 stages).
+    if not exp_name:
+        if dataset not in TRACK_TO_EXP_NAME:
+            raise ValueError(f"Unknown --dataset={dataset!r}; choose from {list(TRACK_TO_EXP_NAME)}")
+        dataset_tracks = TRACK_TO_EXP_NAME[dataset]
+        if track not in dataset_tracks:
+            raise ValueError(f"Unknown --track={track!r} for dataset={dataset!r}; choose from {list(dataset_tracks)}")
+        exp_name = dataset_tracks[track]
+
     exp_dir = os.path.join(CKPT_ROOT, exp_name)
     if not os.path.isdir(exp_dir):
         raise FileNotFoundError(f"No checkpoint dir for track {track} on dataset {dataset}: {exp_dir}")
@@ -132,7 +136,8 @@ def run_convert(track: str, dataset: str, step: int):
 
 
 @app.local_entrypoint()
-def main(track: str = "a", dataset: str = "gsm8k", step: int = -1):
-    """--step=-1 means latest available global_step_* dir."""
-    result = run_convert.remote(track=track, dataset=dataset, step=step)
+def main(track: str = "a", dataset: str = "gsm8k", step: int = -1, exp_name: str = ""):
+    """--step=-1 means latest available global_step_* dir.
+    --exp-name converts that experiment directly, ignoring --track/--dataset."""
+    result = run_convert.remote(track=track, dataset=dataset, step=step, exp_name=exp_name)
     print(f"[main] done: {result}")

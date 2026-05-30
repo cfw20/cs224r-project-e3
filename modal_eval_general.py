@@ -293,14 +293,16 @@ def _pass_at_k(n, c, k):
     return float(1.0 - np.prod(1.0 - k / np.arange(n - c + 1, n + 1)))
 
 
-def _get_score_fn(cfg):
+def _get_score_fn(cfg, scorer_override=None):
     """Return (score_fn, extract_check_fn) pair for the dataset's configured scorer.
 
     score_fn(response_str, ground_truth) -> float in [0, 1]
     extract_check_fn(response_str) -> True if the response *appears* parseable
                                       (used to count "extract failures").
+
+    scorer_override, if provided, takes precedence over cfg["scorer"].
     """
-    scorer = cfg["scorer"]
+    scorer = scorer_override or cfg["scorer"]
     data_source = cfg["data_source"]
 
     if scorer == "curriculum_math":
@@ -348,10 +350,25 @@ def _get_score_fn(cfg):
 
         return score_fn, extract_check
 
+    if scorer == "gsm8k_strict":
+        from verl.utils.reward_score.gsm8k import compute_score, extract_solution
+
+        def score_fn(resp, gt):
+            return float(compute_score(
+                solution_str=resp,
+                ground_truth=str(gt),
+                method="strict",
+            ))
+
+        def extract_check(resp):
+            return extract_solution(resp, method="strict") is not None
+
+        return score_fn, extract_check
+
     raise ValueError(f"Unknown scorer: {scorer}")
 
 
-def _score_outputs(dataset_key, output_path, n_samples, model_tag, tag):
+def _score_outputs(dataset_key, output_path, n_samples, model_tag, tag, scorer_override=None):
     """Score generated responses using the dataset's configured scorer."""
     import os
     import json
@@ -359,8 +376,9 @@ def _score_outputs(dataset_key, output_path, n_samples, model_tag, tag):
     import numpy as np
 
     cfg = DATASETS[dataset_key]
-    score_fn, extract_check = _get_score_fn(cfg)
-    print(f"[score] Using scorer '{cfg['scorer']}' for dataset '{dataset_key}'")
+    score_fn, extract_check = _get_score_fn(cfg, scorer_override=scorer_override)
+    scorer_used = scorer_override or cfg["scorer"]
+    print(f"[score] Using scorer '{scorer_used}' for dataset '{dataset_key}'")
 
     df = pd.read_parquet(output_path)
     num_problems = len(df)
@@ -397,7 +415,7 @@ def _score_outputs(dataset_key, output_path, n_samples, model_tag, tag):
         "dataset": dataset_key,
         "model": model_tag,
         "tag": tag,
-        "scorer": cfg["scorer"],
+        "scorer": scorer_used,
         "num_problems": int(num_problems),
         "n_samples": int(n_samples),
         "extract_failures": int(extract_failures),
@@ -442,11 +460,19 @@ def run_eval(
     split: str,
     output_tag: str,
     use_lm_eval: bool,
+    output_dir: str = "",
+    scorer: str = "",
 ):
     import os
 
     os.environ["HF_HOME"] = "/data/hf_cache"
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
+    # Redirect all eval artifacts to a custom directory (keeps experiments standalone).
+    global DATA_DIR
+    if output_dir:
+        DATA_DIR = output_dir
+    print(f"[run_eval] writing artifacts to {DATA_DIR}")
 
     if dataset not in DATASETS:
         raise ValueError(f"Unknown --dataset={dataset!r}; choose from {list(DATASETS)}")
@@ -549,6 +575,7 @@ def run_eval(
         n_samples=n_samples,
         model_tag=model,
         tag=tag,
+        scorer_override=(scorer or None),
     )
 
     vol.commit()
@@ -567,12 +594,16 @@ def main(
     split: str = "",
     output_tag: str = "",
     use_lm_eval: bool = False,
+    output_dir: str = "",
+    scorer: str = "",
 ):
     """Modal local entrypoint.
 
     --n-samples / --max-response-length default to per-dataset values from DATASETS.
     --num-problems=-1 means use all problems after filtering.
     --subset applies to MATH only: all | 500 | level5.
+    --output-dir overrides where artifacts are written (default /data/aime_eval).
+    --scorer overrides the dataset's default scorer (e.g. gsm8k_strict).
     """
     if dataset not in DATASETS:
         raise ValueError(f"Unknown --dataset={dataset!r}; choose from {list(DATASETS)}")
@@ -603,6 +634,8 @@ def main(
         split=split_v,
         output_tag=output_tag,
         use_lm_eval=use_lm_eval,
+        output_dir=output_dir,
+        scorer=scorer,
     )
     print("\nFinal metrics:")
     for k, v in metrics.items():
