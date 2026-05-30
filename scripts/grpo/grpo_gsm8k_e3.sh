@@ -25,11 +25,6 @@
 #   WANDB_PROJECT            defaults to "e3-gsm8k"
 #   SAVE_FREQ                defaults to 100
 #   TEST_FREQ                defaults to 100
-#   SAVE_HF                  "1" (default) to also write the HF config+tokenizer next to
-#                            the sharded checkpoint (handy for later conversion/eval);
-#                            "0" to save sharded weights only. NOTE: this does NOT save
-#                            HF weights — use modal_convert_ckpt.py to merge shards before
-#                            resuming the next curriculum stage.
 
 set -euo pipefail
 
@@ -45,13 +40,6 @@ MAX_EXTRAPOLATION_LENGTH="${MAX_EXTRAPOLATION_LENGTH:-$((MAX_RESPONSE_LENGTH * 2
 WANDB_PROJECT="${WANDB_PROJECT:-e3-gsm8k}"
 SAVE_FREQ="${SAVE_FREQ:-100}"
 TEST_FREQ="${TEST_FREQ:-100}"
-SAVE_HF="${SAVE_HF:-1}"
-
-if [ "$SAVE_HF" = "1" ]; then
-    CKPT_CONTENTS="['model','optimizer','extra','hf_model']"
-else
-    CKPT_CONTENTS="['model','optimizer','extra']"
-fi
 
 echo "[grpo_gsm8k_e3] TRAIN_PARQUET=$TRAIN_PARQUET"
 echo "[grpo_gsm8k_e3] VAL_PARQUET=$VAL_PARQUET"
@@ -61,7 +49,6 @@ echo "[grpo_gsm8k_e3] EXPERIMENT_NAME=$EXPERIMENT_NAME"
 echo "[grpo_gsm8k_e3] TOTAL_STEPS=$TOTAL_STEPS"
 echo "[grpo_gsm8k_e3] MAX_RESPONSE_LENGTH=$MAX_RESPONSE_LENGTH"
 echo "[grpo_gsm8k_e3] MAX_EXTRAPOLATION_LENGTH=$MAX_EXTRAPOLATION_LENGTH"
-echo "[grpo_gsm8k_e3] CKPT_CONTENTS=$CKPT_CONTENTS"
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
@@ -89,7 +76,6 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.kl_loss_coef=0.001 \
     actor_rollout_ref.actor.kl_loss_type=low_var_kl \
     actor_rollout_ref.actor.entropy_coeff=0.001 \
-    actor_rollout_ref.actor.checkpoint.contents="$CKPT_CONTENTS" \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
     actor_rollout_ref.actor.fsdp_config.param_offload=False \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=False \

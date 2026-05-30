@@ -9,7 +9,7 @@ Runs verl GRPO on a single A100-80GB for either:
 Both tracks share:
   - base model      Qwen/Qwen3-1.7B
   - val parquet     /data/gsm8k_padded/test.parquet
-  - step budget     --total-steps (default 500)
+  - step budget     --total-steps (default 400)
 
 Usage:
     modal run --detach modal_train_gsm8k.py --track a

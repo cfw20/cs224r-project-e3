@@ -462,6 +462,7 @@ def run_eval(
     use_lm_eval: bool,
     output_dir: str = "",
     scorer: str = "",
+    model_path: str = "",
 ):
     import os
 
@@ -476,14 +477,18 @@ def run_eval(
 
     if dataset not in DATASETS:
         raise ValueError(f"Unknown --dataset={dataset!r}; choose from {list(DATASETS)}")
-    if model not in MODEL_IDS:
-        raise ValueError(f"Unknown --model={model!r}; choose from {list(MODEL_IDS)}")
 
-    dataset_models = MODEL_IDS[model]
-    if dataset not in dataset_models:
-        raise ValueError(f"Model {model!r} is not supported or defined for dataset {dataset!r}")
-
-    model_id = dataset_models[dataset]
+    # --model-path bypasses the MODEL_IDS lookup entirely.
+    if model_path:
+        model_id = model_path
+        print(f"[run_eval] using explicit --model-path={model_path}")
+    else:
+        if model not in MODEL_IDS:
+            raise ValueError(f"Unknown --model={model!r}; choose from {list(MODEL_IDS)}")
+        dataset_models = MODEL_IDS[model]
+        if dataset not in dataset_models:
+            raise ValueError(f"Model {model!r} is not supported or defined for dataset {dataset!r}")
+        model_id = dataset_models[dataset]
     tag = output_tag or f"n{n_samples}_l{max_response_length}"
 
     if use_lm_eval:
@@ -596,6 +601,7 @@ def main(
     use_lm_eval: bool = False,
     output_dir: str = "",
     scorer: str = "",
+    model_path: str = "",
 ):
     """Modal local entrypoint.
 
@@ -604,6 +610,7 @@ def main(
     --subset applies to MATH only: all | 500 | level5.
     --output-dir overrides where artifacts are written (default /data/aime_eval).
     --scorer overrides the dataset's default scorer (e.g. gsm8k_strict).
+    --model-path loads an arbitrary HF checkpoint instead of the MODEL_IDS lookup.
     """
     if dataset not in DATASETS:
         raise ValueError(f"Unknown --dataset={dataset!r}; choose from {list(DATASETS)}")
@@ -636,6 +643,7 @@ def main(
         use_lm_eval=use_lm_eval,
         output_dir=output_dir,
         scorer=scorer,
+        model_path=model_path,
     )
     print("\nFinal metrics:")
     for k, v in metrics.items():

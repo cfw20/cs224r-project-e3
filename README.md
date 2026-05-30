@@ -48,42 +48,40 @@ modal run modal_eval_general.py --dataset math  --model qwen
 modal run modal_eval_general.py --dataset aime  --model e3
 ```
 
-## Data augmentation experiment
+## Experiments
+
+We run **two distinct experiments**, each with its own tracks:
+
+1. **Noise-control generalization (RLAD)** — Tests whether training with trivia-augmented prompts improves generalization on clean data. Run on both GSM8K and Hendrycks MATH.
+2. **E3 curriculum on GSM8K** — Adapts the e3 training recipe (negative gradients + asymmetric clipping + curriculum) to GSM8K with a two-stage easy→hard curriculum.
+
+### Track summary
+
+| Track | Experiment | Dataset | Data | Description | GPU | Wandb project |
+|-------|------------|---------|------|-------------|-----|---------------|
+| **A** | Noise-control | GSM8K | clean | Standard GRPO, clean data | H100 | `rlad-noise-control` |
+| **B** | Noise-control | GSM8K | mixed | Standard GRPO, trivia-augmented | H100 | `rlad-noise-control` |
+| **A** | Noise-control | Hendrycks | clean | Standard GRPO, clean data | H200 | `rlad-hendrycks` |
+| **B** | Noise-control | Hendrycks | mixed | Standard GRPO, trivia-augmented | H200 | `rlad-hendrycks` |
+| **C** | E3 curriculum | GSM8K | clean | E3 recipe: easy→hard curriculum | H100 | `e3-gsm8k` |
+| **D** | E3 curriculum | GSM8K | mixed | E3 recipe + trivia noise, easy→hard | H100 | `e3-gsm8k` |
+
+> **Why H200 for Hendrycks?** Hendrycks MATH uses `max_response_length=2048` (vs. 1024 for GSM8K) and `ppo_max_token_len_per_gpu=32768` (vs. 16384), requiring more VRAM. All other tracks use H100.
+
+All checkpoints land under `/data/ckpts/` on the `e3-generation-vol` Volume. Data for each experiment lives in its own directory to avoid clashes:
+- Noise-control GSM8K: `/data/gsm8k_padded/`
+- Noise-control Hendrycks: `/data/hendrycks_math/`
+- E3 curriculum GSM8K: `/data/e3_gsm8k/`
+
+---
+
+## Experiment 1: Noise-control generalization (RLAD)
 
 ### Theoretical motivation
 
 This experiment tests a **noise-control generalization hypothesis** inspired by curriculum-learning literature: *does exposing a model to irrelevant but factual noise during RL training force it to learn more robust extraction and reasoning strategies, thereby improving generalization on clean data?*
 
 The core idea is that models trained solely on clean, tightly-coupled prompt-reward distributions may overfit to surface-level correlations. By deliberately injecting **semantically unrelated but grammatically coherent text** into a subset of training prompts, we force the policy to learn to *ignore* distractors and attend to the task-relevant signal. If the model successfully learns this filtering behavior, it should generalize *better* on the clean test distribution than a model trained exclusively on clean data (Track A), because it has been regularized against spurious correlations.
-
-We operationalize this on two math benchmarks:
-
-- **GSM8K** (grade-school math): Answers are strictly numerical, making reward computation unambiguous. Questions are short and self-contained, so prepended trivia does not semantically interfere with the problem logic.
-- **Hendrycks MATH** (competition math): Problems require multi-step symbolic reasoning and terminate answers in `\boxed{}`. The longer reasoning chains and more complex answer formats provide a stronger test of whether the model can maintain structured reasoning despite noise.
-
-Both provide controlled settings where we can precisely attribute performance differences to the noise-augmented training regimen.
-
-### Experiment design
-
-We run **two independent GRPO training tracks** on Qwen3-1.7B for each dataset, using identical hyperparameters and evaluation protocols within that dataset:
-
-#### GSM8K
-
-| Track | Training data | Size | Description |
-|---|---|---|---|
-| **A (clean)** | `train_clean.parquet` | 7,473 rows | Standard GSM8K train split. |
-| **B (mixed)** | `train_mixed.parquet` | 14,946 rows | 7,473 originals + 7,473 copies with prepended trivia. |
-
-Both tracks evaluate on the **same clean test split** (`test.parquet`, 1,319 rows).
-
-#### Hendrycks MATH
-
-| Track | Training data | Size | Description |
-|---|---|---|---|
-| **A (clean)** | `train_clean.parquet` | ~7,500 rows | Standard Hendrycks MATH train split. |
-| **B (mixed)** | `train_mixed.parquet` | ~15,000 rows | ~7,500 originals + ~7,500 copies with prepended trivia. |
-
-Both tracks evaluate on the **same clean validation split** (`test.parquet`, 500 rows from MATH-500).
 
 ### How the augmented dataset is created
 
@@ -162,7 +160,6 @@ Both tracks for a given dataset use the same GRPO configuration (defined in a da
 
 **Shared across both datasets:**
 - **Base model**: `Qwen/Qwen3-1.7B`
-- **GPU**: H100 (single node, 1 GPU)
 - **Algorithm**: GRPO (`adv_estimator=grpo`)
 - **Train batch size**: 64 prompts per step
 - **Rollouts per prompt**: 8 (`rollout.n=8`) for training, 4 for validation
@@ -174,7 +171,6 @@ Both tracks for a given dataset use the same GRPO configuration (defined in a da
 - **PPO mini/micro batch size**: 32
 - **Gradient checkpointing**: enabled
 - **FSDP param offload (reference)**: enabled (saves memory)
-- **vLLM GPU memory utilization**: 0.6 (leaves headroom for PyTorch)
 - **Total steps**: 400
 - **Validation frequency**: every 100 steps
 - **Checkpoint frequency**: every 100 steps
@@ -184,79 +180,70 @@ Both tracks for a given dataset use the same GRPO configuration (defined in a da
 | Parameter | GSM8K | Hendrycks MATH |
 |---|---|---|
 | `data.max_response_length` | 1024 | 2048 |
-| `test_freq` / `val_freq` | every 100 steps | every 100 steps (calibrated for 500-problem MATH-500)
+| `test_freq` | every 100 steps | every 25 steps |
 | `actor.ppo_max_token_len_per_gpu` | 16384 | 32768 |
 | `rollout.max_num_batched_tokens` | 16384 | 32768 |
+| `rollout.gpu_memory_utilization` | 0.6 | 0.8 |
 | Custom reward function | `gsm8k_custom.py` (strict) | Default `math.py` (boxed) |
-| Wandb project | `rlad-noise-control` | `rlad-hendrycks` |
 
 The longer response and batch-token budgets for Hendrycks MATH accommodate the significantly longer reasoning chains required by competition-level problems.
 
-### Running the end-to-end experiment (GSM8K)
+---
 
-#### Step 1: Generate and upload data to Modal Volume
+### Noise-control GSM8K — Tracks A & B
+
+#### Step 1: Generate and upload data
 
 ```bash
 modal run scripts/data_upload_gsm8k.py
 ```
 
-This single command runs `gsm8k_padded.py` twice inside a Modal container (once for `--mode clean`, once for `--mode mixed`) and writes all three parquets (`train_clean.parquet`, `train_mixed.parquet`, `test.parquet`) to the shared `e3-generation-vol` Volume.
+Writes `train_clean.parquet`, `train_mixed.parquet`, `test.parquet` to `/data/gsm8k_padded/` on the Volume.
 
-#### Step 2: Train Track A (clean)
+#### Step 2: Train
 
 ```bash
+# Track A (clean)
 modal run --detach modal_train_gsm8k.py --track a
-```
 
-This trains on `train_clean.parquet` for 400 steps with validation every 100 steps. Checkpoints and wandb logs are automatically saved. The `--detach` flag returns your terminal immediately while the job runs in the cloud.
-
-#### Step 3: Train Track B (mixed)
-
-```bash
+# Track B (mixed)
 modal run --detach modal_train_gsm8k.py --track b
 ```
 
-This trains on `train_mixed.parquet` with identical hyperparameters. You can run this in parallel with Track A if you have separate Modal GPU quota, or run it sequentially after Track A finishes.
-
-#### Step 4: Evaluate both checkpoints
-
-After training completes, convert the latest verl FSDP checkpoint to HuggingFace format (this is handled by `modal_convert_ckpt.py`):
+#### Step 3: Convert checkpoints
 
 ```bash
 modal run modal_convert_ckpt.py --track a
 modal run modal_convert_ckpt.py --track b
 ```
 
-Then evaluate each converted checkpoint on the clean GSM8K test set using the industry-standard `lm-eval` package:
+#### Step 4: Evaluate on clean test set
 
 ```bash
+# Using lm-eval (industry-standard GSM8K benchmark)
 modal run modal_eval_general.py --dataset gsm8k --model track_a --use-lm-eval
 modal run modal_eval_general.py --dataset gsm8k --model track_b --use-lm-eval
 ```
 
-#### Smoke test (2 steps)
-
-Before committing to the full 400-step run, verify the pipeline works:
+#### Smoke test
 
 ```bash
 modal run modal_train_gsm8k.py --track a --total-steps 2
 ```
 
-This completes in ~5-10 minutes on an H100 and validates that data loading, vLLM generation, reward scoring, and wandb logging all function correctly.
+---
 
-### Running the end-to-end experiment (Hendrycks MATH)
+### Noise-control Hendrycks MATH — Tracks A & B
 
-The Hendrycks MATH pipeline is structurally identical to the GSM8K pipeline, but uses dataset-specific scripts and hyperparameters.
-
-#### Step 1: Generate and upload data to Modal Volume
+#### Step 1: Generate and upload data
 
 ```bash
 modal run scripts/data_upload_hendrycks.py
 ```
 
-This runs `hendrycks_padded.py` twice (clean and mixed) to generate the training parquets, then `math500_prep.py` once to overwrite `test.parquet` with the canonical MATH-500 validation set (500 problems). All files are written to `/data/hendrycks_math/` on the `e3-generation-vol` Volume.
+Writes `train_clean.parquet`, `train_mixed.parquet`, and overwrites `test.parquet` with the canonical MATH-500 validation set (500 problems) to `/data/hendrycks_math/` on the Volume.
 
-#### Step 2: Train both tracks
+#### Step 2: Train
 
 ```bash
 # Track A (clean)
@@ -266,18 +253,14 @@ modal run --detach modal_train_hendrycks.py --track a
 modal run --detach modal_train_hendrycks.py --track b
 ```
 
-Both use `scripts/grpo/grpo_hendrycks_a100.sh` with the longer response budgets described above. The default is 400 steps; override with `--total-steps N` if needed.
-
-#### Step 3: Evaluate both checkpoints
-
-Convert checkpoints:
+#### Step 3: Convert checkpoints
 
 ```bash
 modal run modal_convert_ckpt.py --track a --dataset math
 modal run modal_convert_ckpt.py --track b --dataset math
 ```
 
-Evaluate on the clean Hendrycks MATH test set:
+#### Step 4: Evaluate on clean test set
 
 ```bash
 modal run modal_eval_general.py --dataset math --model track_a
@@ -290,14 +273,132 @@ modal run modal_eval_general.py --dataset math --model track_b
 modal run modal_train_hendrycks.py --track a --total-steps 2
 ```
 
-### Analyzing results
+---
 
-After both tracks finish training, you can compare them using the analysis notebooks and scripts in the repository:
+## Experiment 2: E3 curriculum on GSM8K
 
-- `notebooks/rollouts/` — Contains per-step rollout JSONs and analysis for each track.
+This experiment adapts the **e3 training recipe** to GSM8K. The e3 recipe has three key ingredients:
+1. **Asymmetric PPO clipping** (`clip_ratio_low=0.2`, `clip_ratio_high=0.5`)
+2. **Negative gradients** (`only_train_on_positive=False`)
+3. **Curriculum training** — start with easy problems and a short token budget, then graduate to harder problems and a longer budget.
+
+We run this on both clean and mixed GSM8K data to isolate the interaction between curriculum training and noise augmentation.
+
+### Curriculum design
+
+| Stage | Data | `max_response_length` | Starting checkpoint |
+|-------|------|----------------------|---------------------|
+| 1 | easy split (clean or mixed) | 512 | Qwen3-1.7B base |
+| 2 | hard split (clean or mixed) | 1024 | Converted stage-1 HF checkpoint |
+
+Validation always uses `max_extrapolation_length = 2 * max_response_length` to test whether the model extrapolates to longer contexts than it was trained on.
+
+> **Resuming between stages.** verl's FSDP checkpoints are sharded `.pt` files. Between stages you must merge them into a real HF model with `modal_convert_ckpt.py`. The in-loop `huggingface/` subdir only stores config + tokenizer, **not** the weights.
+
+### How the easy/hard split is produced
+
+1. Run a **strict** `#### N` scorer eval on the GSM8K **train** split at a 512-token budget (matching the stage-1 training reward):
+   ```bash
+   modal run modal_eval_general.py --dataset gsm8k --model qwen --split train \
+       --scorer gsm8k_strict --max-response-length 512 \
+       --output-dir /data/e3_gsm8k --output-tag train_strict_l512
+   ```
+2. Use `scripts/e3-grpo-gsm8k/split_gsm8k_dataset.ipynb` to:
+   - Read the per-problem accuracy CSV from the Volume.
+   - Partition ~70% highest-accuracy problems as **easy**, ~30% lowest as **hard**.
+   - Generate four training parquets (`train_easy_clean`, `train_hard_clean`, `train_easy_mixed`, `train_hard_mixed`) and one clean `test.parquet`.
+   - Spot-check sample easy vs. hard questions with base-model answers.
+3. Upload the split parquets to the Volume:
+   ```bash
+   modal run scripts/data_upload_e3_gsm8k.py
+   ```
+
+### E3 GSM8K — Track C (clean)
+
+#### Stage 1: easy, 512 tokens
+
+```bash
+modal run --detach modal_train_e3_gsm8k.py --track c --stage 1
+```
+
+#### Convert stage-1 checkpoint
+
+```bash
+modal run modal_convert_ckpt.py --exp-name qwen3-1p7b-gsm8k-e3-clean-stage1
+```
+
+#### Stage 2: hard, 1024 tokens
+
+```bash
+modal run --detach modal_train_e3_gsm8k.py --track c --stage 2
+```
+
+#### Evaluate final checkpoint
+
+```bash
+modal run modal_convert_ckpt.py --exp-name qwen3-1p7b-gsm8k-e3-clean-stage2
+modal run modal_eval_general.py --dataset gsm8k --model qwen \
+    --model-path /data/ckpts/qwen3-1p7b-gsm8k-e3-clean-stage2_hf --use-lm-eval
+```
+
+> `--model-path` bypasses the `MODEL_IDS` lookup and points directly at the converted HF checkpoint.
+
+---
+
+### E3 GSM8K — Track D (mixed)
+
+#### Stage 1: easy mixed, 512 tokens
+
+```bash
+modal run --detach modal_train_e3_gsm8k.py --track d --stage 1
+```
+
+#### Convert stage-1 checkpoint
+
+```bash
+modal run modal_convert_ckpt.py --exp-name qwen3-1p7b-gsm8k-e3-mixed-stage1
+```
+
+#### Stage 2: hard mixed, 1024 tokens
+
+```bash
+modal run --detach modal_train_e3_gsm8k.py --track d --stage 2
+```
+
+#### Evaluate final checkpoint
+
+```bash
+modal run modal_convert_ckpt.py --exp-name qwen3-1p7b-gsm8k-e3-mixed-stage2
+modal run modal_eval_general.py --dataset gsm8k --model qwen \
+    --model-path /data/ckpts/qwen3-1p7b-gsm8k-e3-mixed-stage2_hf --use-lm-eval
+```
+
+---
+
+## Evaluating arbitrary checkpoints
+
+`modal_eval_general.py` supports two ways to specify the model to evaluate:
+
+1. **Named model** (`--model qwen`, `--model track_a`, `--model e3`) — looks up the path in the internal `MODEL_IDS` table.
+2. **Arbitrary path** (`--model-path /data/ckpts/...`) — bypasses the lookup entirely. Use this for e3 stages or any custom checkpoint.
+
+Example:
+```bash
+modal run modal_eval_general.py --dataset gsm8k --model qwen \
+    --model-path /data/ckpts/my-custom-experiment_hf --use-lm-eval
+```
+
+---
+
+## Analyzing results
+
+After tracks finish training, compare them using:
+
+- `notebooks/rollouts/` — Per-step rollout JSONs and analysis for each track.
 - `analyze_rollouts.py` — Standalone script for computing accuracy, response length, and answer-position statistics across saved rollouts.
 
 Key metrics to compare across tracks:
 - **Validation accuracy** at each checkpoint
 - **Average response length** (shorter responses often indicate more confident, direct reasoning)
 - **Answer position** (earlier placement of the final answer suggests more efficient reasoning chains)
+- **Extrapolation performance** (e3 only): accuracy at `2x` the training response length
