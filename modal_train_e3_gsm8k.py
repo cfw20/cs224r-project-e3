@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Modal training entrypoint for the e3 GSM8K curriculum experiment (Track C / D).
+Modal training entrypoint for the e3 GSM8K curriculum experiment (Track C / D / E).
 
 Runs verl GRPO with the e3 recipe (negative gradients + asymmetric clipping) on a
 single H100/A100-80GB, in a two-stage curriculum:
@@ -9,12 +9,13 @@ single H100/A100-80GB, in a two-stage curriculum:
   Stage 2: hard split,  max_response_length=1024, start from the stage-1 checkpoint
 
 Tracks:
-  --track c : clean GSM8K splits   (train_easy_clean / train_hard_clean)
-  --track d : trivia-mixed splits  (train_easy_mixed / train_hard_mixed)
+  --track c : clean GSM8K splits        (train_easy_clean / train_hard_clean)
+  --track d : trivia-mixed splits       (train_easy_mixed / train_hard_mixed)
+  --track e : trivia-only splits        (train_easy_trivia / train_hard_trivia)
 
 Data lives under /data/e3_gsm8k/ on the e3-generation-vol Volume (upload it first
 with scripts/data_upload_e3_gsm8k.py). Checkpoints land in
-/data/ckpts/qwen3-1p7b-gsm8k-e3-{clean,mixed}-stage{1,2}.
+/data/ckpts/qwen3-1p7b-gsm8k-e3-{clean,mixed,trivia}-stage{1,2}.
 
 IMPORTANT: between stage 1 and stage 2 you must convert the stage-1 FSDP checkpoint
 to an HF model so stage 2 can resume from real weights (the in-loop `huggingface/`
@@ -46,8 +47,8 @@ DATA_DIR = "/data/e3_gsm8k"                # split parquets live here
 CKPT_ROOT = "/data/ckpts"                  # checkpoints land here
 BASE_MODEL = "Qwen/Qwen3-1.7B"
 
-# track -> "clean" | "mixed"
-TRACK_TO_FLAVOR = {"c": "clean", "d": "mixed"}
+# track -> "clean" | "mixed" | "trivia"
+TRACK_TO_FLAVOR = {"c": "clean", "d": "mixed", "e": "trivia"}
 
 # stage -> (split, max_response_length)
 STAGE_TO_CONFIG = {

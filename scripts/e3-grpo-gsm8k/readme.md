@@ -55,23 +55,24 @@ This writes `per_problem_gsm8k_qwen_train_strict_l512.csv` to `/data/e3_gsm8k/` 
 > **Note on the scorer.** The default GSM8K eval scorer in `modal_eval_general.py` is `gsm8k_flexible` (last-number-in-response) at a long budget. For difficulty splitting we deliberately switch to `gsm8k_strict` so the measured difficulty matches what the model is actually rewarded for during e3 training. A test-split flexible eval already exists on the volume (`per_problem_gsm8k_qwen_n4_l32768.csv`); only this **train-split, strict, 512-token** eval is new.
 
 A new notebook, **`split_gsm8k_dataset.ipynb`**, will be created in this directory (`/home/chung/cs224r-project-e3/scripts/e3-grpo-gsm8k/`). It will:
-1. Read the eval CSV from `/data/e3_gsm8k/` and generate the four split parquets (`train_easy_clean.parquet`, `train_hard_clean.parquet`, `train_easy_mixed.parquet`, `train_hard_mixed.parquet`).
+1. Read the eval CSV from `/data/e3_gsm8k/` and generate the six split parquets (`train_easy_clean.parquet`, `train_hard_clean.parquet`, `train_easy_mixed.parquet`, `train_hard_mixed.parquet`, `train_easy_trivia.parquet`, `train_hard_trivia.parquet`).
 2. Let the user **spot-check** sample easy questions vs. hard questions, along with the base model's generated answers, to sanity-check the split quality.
 
 All artifacts for this experiment are kept under `/data/e3_gsm8k/` on the Modal volume to avoid conflicts with other experiments.
 
 ### 2. Upload split parquets to Modal volume
-Use `scripts/data_upload_e3_gsm8k.py` (modeled on `scripts/data_upload_gsm8k.py`) to upload the four split parquets plus a clean `test.parquet` to `/data/e3_gsm8k/` on the same Modal volume.
+Use `scripts/data_upload_e3_gsm8k.py` (modeled on `scripts/data_upload_gsm8k.py`) to upload the six split parquets plus a clean `test.parquet` to `/data/e3_gsm8k/` on the same Modal volume.
 
-### 3. Two e3 training tracks: Track C and Track D
-Following the data-augmentation experiment design (Track A = clean, Track B = mixed), we run two independent e3 training tracks on the GSM8K curriculum:
+### 3. Three e3 training tracks: Track C, Track D and Track E
+Following the data-augmentation experiment design (Track A = clean, Track B = mixed), we run three independent e3 training tracks on the GSM8K curriculum:
 
 | Track | Training data | Description |
 |-------|--------------|-------------|
 | **C (clean)** | `train_easy_clean.parquet` + `train_hard_clean.parquet` | Standard e3 curriculum on clean GSM8K splits. |
-| **D (mixed)** | `train_easy_mixed.parquet` + `train_hard_mixed.parquet` | Same curriculum, but each split includes padded clones with prepended trivia. |
+| **D (mixed)** | `train_easy_mixed.parquet` + `train_hard_mixed.parquet` | Same curriculum, but each split includes clean originals **plus** padded clones with prepended trivia. |
+| **E (trivia-only)** | `train_easy_trivia.parquet` + `train_hard_trivia.parquet` | Same curriculum on **only** trivia-padded questions (no clean originals). Trivia facts are drawn independently from `TRIVIA_FACTS`. |
 
-Both tracks evaluate on the **same clean test split** (`test.parquet`). Training is launched via `modal_train_e3_gsm8k.py --track {c,d} --stage {1,2}`, writing checkpoints to `ckpts/qwen3-1p7b-gsm8k-e3-{track}-stage{N}`.
+All tracks evaluate on the **same clean test split** (`test.parquet`). Training is launched via `modal_train_e3_gsm8k.py --track {c,d,e} --stage {1,2}`, writing checkpoints to `ckpts/qwen3-1p7b-gsm8k-e3-{flavor}-stage{N}` where `flavor` is `clean` (c), `mixed` (d), or `trivia` (e).
 
 Training uses `scripts/grpo/grpo_gsm8k_e3.sh` — a parametrized copy of `grpo_gsm8k_a100.sh` that takes `MAX_RESPONSE_LENGTH`, `MAX_EXTRAPOLATION_LENGTH`, and `MODEL_PATH` via env vars. It keeps the e3 hyperparameters:
 
@@ -114,6 +115,18 @@ modal run modal_convert_ckpt.py --exp-name qwen3-1p7b-gsm8k-e3-clean-stage1
 modal run --detach modal_train_e3_gsm8k.py --track c --stage 2
 ```
 For Track D, swap `--track c` for `--track d` and use `qwen3-1p7b-gsm8k-e3-mixed-stage1` in the convert step.
+
+For Track E (trivia-only), swap `--track c` for `--track e` and use `qwen3-1p7b-gsm8k-e3-trivia-stage1` in the convert step:
+```bash
+# Track E Stage 1 (easy, 512)
+modal run --detach modal_train_e3_gsm8k.py --track e --stage 1
+
+# Convert stage-1 checkpoint to HF so stage 2 can resume
+modal run modal_convert_ckpt.py --exp-name qwen3-1p7b-gsm8k-e3-trivia-stage1
+
+# Track E Stage 2 (hard, 1024) — resumes from the converted stage-1 model
+modal run --detach modal_train_e3_gsm8k.py --track e --stage 2
+```
 
 ### Important nuance
 The eval must run on `--split train`, not the default test split, because we need per-problem accuracy on the **training** data to decide which problems are easy vs. hard. The default in `modal_eval_general.py` for GSM8K is `default_split="test"`, so `--split train` is required.

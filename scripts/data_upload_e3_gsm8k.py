@@ -12,6 +12,8 @@ Expected files in --local-dir:
     train_hard_clean.parquet
     train_easy_mixed.parquet
     train_hard_mixed.parquet
+    train_easy_trivia.parquet
+    train_hard_trivia.parquet
     test.parquet
 
 Usage:
@@ -34,6 +36,8 @@ EXPECTED_FILES = [
     "train_hard_clean.parquet",
     "train_easy_mixed.parquet",
     "train_hard_mixed.parquet",
+    "train_easy_trivia.parquet",
+    "train_hard_trivia.parquet",
     "test.parquet",
 ]
 
