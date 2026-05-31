@@ -275,7 +275,7 @@ def _run_generation(
         "rollout.gpu_memory_utilization=0.9",
         "rollout.enforce_eager=False",
         "rollout.free_cache_engine=False",
-        "rollout.max_num_batched_tokens=50000",
+        "rollout.max_num_batched_tokens=100000",
         # required workarounds (keys missing from generation.yaml)
         "+rollout.extrapolation_val=False",
         "+rollout.extrapolation_length=0",
@@ -562,7 +562,7 @@ def run_eval(
     output_path = os.path.join(
         DATA_DIR, f"{dataset}_{model}_{tag}_outputs.parquet"
     )
-    batch_size = min(n_problems, 24)
+    batch_size = min(n_problems, 128)
     _run_generation(
         data_path=data_path,
         output_path=output_path,
