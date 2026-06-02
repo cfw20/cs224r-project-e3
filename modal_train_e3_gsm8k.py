@@ -63,7 +63,7 @@ def _exp_name(flavor: str, stage: int) -> str:
 
 @app.function(
     image=image,
-    gpu="H100",
+    gpu="H200",
     volumes={"/data": vol},
     secrets=[modal.Secret.from_name("wandb-secret")],
     timeout=24 * 3600,
