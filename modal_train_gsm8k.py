@@ -39,14 +39,14 @@ TRACK_TO_TRAIN_PARQUET = {
     "b": "train_mixed.parquet",
 }
 TRACK_TO_EXP_NAME = {
-    "a": "qwen3-1p7b-gsm8k-grpo-clean",
-    "b": "qwen3-1p7b-gsm8k-grpo-mixed",
+    "a": "qwen3-1p7b-gsm8k-grpo-clean-v2",
+    "b": "qwen3-1p7b-gsm8k-grpo-mixed-v2",
 }
 
 
 @app.function(
     image=image,
-    gpu="H100",
+    gpu="H200",
     volumes={"/data": vol},
     secrets=[modal.Secret.from_name("wandb-secret")],
     timeout=24 * 3600,
