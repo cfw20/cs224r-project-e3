@@ -38,10 +38,40 @@ TRACK_TO_TRAIN_PARQUET = {
     "a": "train_clean.parquet",
     "b": "train_mixed.parquet",
 }
+TRACK_TO_FLAVOR = {
+    "a": "clean",
+    "b": "mixed",
+}
+
+# Backward-compatible names for the default 1.7B model (keeps existing runs intact).
 TRACK_TO_EXP_NAME = {
     "a": "qwen3-1p7b-gsm8k-grpo-clean-v2",
     "b": "qwen3-1p7b-gsm8k-grpo-mixed-v2",
 }
+
+
+def _model_slug(model: str) -> str:
+    """Turn an HF model id into a filesystem/wandb-safe slug.
+
+    e.g. "Qwen/Qwen3-0.6B" -> "qwen3-0p6b"
+    """
+    tail = model.rstrip("/").split("/")[-1]
+    return tail.lower().replace(".", "p")
+
+
+def _derive_exp_name(track: str, base_model: str, exp_name: str) -> str:
+    """Resolve the experiment name.
+
+    Priority:
+      1. explicit --exp-name override
+      2. backward-compatible v2 names when base_model is the default 1.7B
+      3. auto-generated name from the model slug otherwise
+    """
+    if exp_name:
+        return exp_name
+    if base_model == BASE_MODEL:
+        return TRACK_TO_EXP_NAME[track]
+    return f"{_model_slug(base_model)}-gsm8k-grpo-{TRACK_TO_FLAVOR[track]}"
 
 
 @app.function(
@@ -51,7 +81,7 @@ TRACK_TO_EXP_NAME = {
     secrets=[modal.Secret.from_name("wandb-secret")],
     timeout=24 * 3600,
 )
-def run_train(track: str, total_steps: int, save_freq: int, test_freq: int):
+def run_train(track: str, total_steps: int, save_freq: int, test_freq: int, base_model: str, exp_name: str):
     import os
     import subprocess
 
@@ -64,7 +94,7 @@ def run_train(track: str, total_steps: int, save_freq: int, test_freq: int):
 
     train_parquet = os.path.join(DATA_DIR, TRACK_TO_TRAIN_PARQUET[track])
     val_parquet = os.path.join(DATA_DIR, "test.parquet")
-    exp_name = TRACK_TO_EXP_NAME[track]
+    exp_name = _derive_exp_name(track, base_model, exp_name)
     ckpt_dir = os.path.join(CKPT_ROOT, exp_name)
     os.makedirs(ckpt_dir, exist_ok=True)
 
@@ -78,7 +108,7 @@ def run_train(track: str, total_steps: int, save_freq: int, test_freq: int):
     env.update({
         "TRAIN_PARQUET": train_parquet,
         "VAL_PARQUET": val_parquet,
-        "BASE_MODEL": BASE_MODEL,
+        "BASE_MODEL": base_model,
         "CKPT_DIR": ckpt_dir,
         "EXPERIMENT_NAME": exp_name,
         "TOTAL_STEPS": str(total_steps),
@@ -88,7 +118,7 @@ def run_train(track: str, total_steps: int, save_freq: int, test_freq: int):
     })
 
     cmd = ["bash", os.path.join(REPO_PATH, "scripts/grpo/grpo_gsm8k_a100.sh")]
-    print(f"[modal_train] track={track} exp={exp_name} steps={total_steps}")
+    print(f"[modal_train] track={track} exp={exp_name} base_model={base_model} steps={total_steps}")
     print(f"[modal_train] train_parquet={train_parquet}")
     print(f"[modal_train] val_parquet={val_parquet}")
     print(f"[modal_train] ckpt_dir={ckpt_dir}")
@@ -107,12 +137,21 @@ def main(
     total_steps: int = 400,
     save_freq: int = 100,
     test_freq: int = 100,
+    base_model: str = BASE_MODEL,
+    exp_name: str = "",
 ):
-    print(f"[main] track={track} total_steps={total_steps} save_freq={save_freq} test_freq={test_freq}")
+    """--base-model swaps the base model (default Qwen/Qwen3-1.7B).
+    --exp-name overrides the experiment name; otherwise it is auto-derived
+    (backward-compatible v2 names for the default 1.7B model, slug-based
+    names like 'qwen3-0p6b-gsm8k-grpo-clean' for any other model)."""
+    print(f"[main] track={track} base_model={base_model} exp_name={exp_name or '<auto>'} "
+          f"total_steps={total_steps} save_freq={save_freq} test_freq={test_freq}")
     result = run_train.remote(
         track=track,
         total_steps=total_steps,
         save_freq=save_freq,
         test_freq=test_freq,
+        base_model=base_model,
+        exp_name=exp_name,
     )
     print(f"[main] done: {result}")
