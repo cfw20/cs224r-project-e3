@@ -39,7 +39,7 @@ python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
     data.train_files="$TRAIN_PARQUET" \
     data.val_files="$VAL_PARQUET" \
-    data.train_batch_size=64 \
+    data.train_batch_size=128 \
     data.max_prompt_length=512 \
     data.max_response_length=1024 \
     data.filter_overlong_prompts=True \
@@ -68,7 +68,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.temperature=0.6 \
     actor_rollout_ref.rollout.val_kwargs.temperature=0.6 \
     actor_rollout_ref.rollout.val_kwargs.do_sample=True \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.7 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.8 \
     actor_rollout_ref.rollout.max_num_batched_tokens=16384 \
     actor_rollout_ref.rollout.n=8 \
     actor_rollout_ref.rollout.val_kwargs.n=4 \
