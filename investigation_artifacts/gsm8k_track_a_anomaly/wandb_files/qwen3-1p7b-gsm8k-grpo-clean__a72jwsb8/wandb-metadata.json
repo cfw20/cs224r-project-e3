@@ -1,0 +1,58 @@
+{
+  "os": "Linux-4.4.0-x86_64-with-glibc2.35",
+  "python": "CPython 3.10.12",
+  "startedAt": "2026-05-24T18:22:03.288456Z",
+  "args": [
+    "--node-ip-address=172.20.3.214",
+    "--node-manager-port=59233",
+    "--object-store-name=/tmp/ray/session_2026-05-24_18-20-57_260673_135/sockets/plasma_store",
+    "--raylet-name=/tmp/ray/session_2026-05-24_18-20-57_260673_135/sockets/raylet",
+    "--redis-address=None",
+    "--metrics-agent-port=0",
+    "--logging-rotate-bytes=536870912",
+    "--logging-rotate-backup-count=5",
+    "--runtime-env-agent-port=0",
+    "--gcs-address=172.20.3.214:26768",
+    "--session-name=session_2026-05-24_18-20-57_260673_135",
+    "--temp-dir=/tmp/ray",
+    "--webui=127.0.0.1:8265",
+    "--cluster-id=885d1af6ec69fd11ea54d4d3a1b143f7ee6cd5683fb1956118b37c5c",
+    "--worker-id=c999c6700c819ab62ee8997a18d260320834e8d77b286fdafa6f36e9",
+    "--worker-launch-time-ms=1779646867047",
+    "--node-id=938fcc959bcda7d04d873952cba4c76ee9e6713537066c3b421c6a40",
+    "--runtime-env-hash=-1053485826"
+  ],
+  "program": "/usr/local/lib/python3.10/dist-packages/ray/_private/workers/default_worker.py",
+  "git": {
+    "remote": "https://github.com/cfw20/cs224r-project-e3.git",
+    "commit": "65d0229cdb9fe9c09a964274622e37273d9fd924"
+  },
+  "email": "cfw20@stanford.edu",
+  "root": "/root/e3",
+  "host": "modal",
+  "executable": "/usr/bin/python3",
+  "cpu_count": 17,
+  "cpu_count_logical": 17,
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "9223372036854771712",
+      "used": "4726784"
+    }
+  },
+  "memory": {
+    "total": "1099511627776"
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA H100 80GB HBM3",
+      "memoryTotal": "85520809984",
+      "cudaCores": 16896,
+      "architecture": "Hopper",
+      "uuid": "GPU-8d270423-5242-89ea-d1fd-056012111039"
+    }
+  ],
+  "cudaVersion": "13.0",
+  "writerId": "37wacpxw3nwru3doscc9t8zmw1yylqnw"
+}

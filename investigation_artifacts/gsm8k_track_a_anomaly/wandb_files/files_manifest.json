@@ -1,0 +1,358 @@
+[
+  {
+    "id": "go4zdpgb",
+    "name": "qwen3-1p7b-gsm8k-grpo-clean",
+    "files": [
+      {
+        "name": "artifact/2865623154/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2866351059/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2867043379/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2867572284/wandb_manifest.json",
+        "size": 0
+      },
+      {
+        "name": "artifact/2923574044/wandb_manifest.json",
+        "size": 0
+      },
+      {
+        "name": "media/table/val/generations_0_c941df3faddeff013ac4.table.json",
+        "size": 10203
+      },
+      {
+        "name": "media/table/val/generations_199_e29873a138ba2fc1bc6c.table.json",
+        "size": 30326
+      },
+      {
+        "name": "media/table/val/generations_99_6113475f0fb0e58f9c99.table.json",
+        "size": 19367
+      },
+      {
+        "name": "requirements.txt",
+        "size": 8030
+      },
+      {
+        "name": "wandb-metadata.json",
+        "size": 1912
+      }
+    ]
+  },
+  {
+    "id": "a72jwsb8",
+    "name": "qwen3-1p7b-gsm8k-grpo-clean",
+    "files": [
+      {
+        "name": "artifact/2876481996/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2877200971/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2878542080/wandb_manifest.json",
+        "size": 0
+      },
+      {
+        "name": "artifact/2923580036/wandb_manifest.json",
+        "size": 0
+      },
+      {
+        "name": "media/table/val/generations_0_b47200622295a0df82f8.table.json",
+        "size": 11081
+      },
+      {
+        "name": "media/table/val/generations_299_d9eb8d1b95632a515136.table.json",
+        "size": 21130
+      },
+      {
+        "name": "requirements.txt",
+        "size": 8030
+      },
+      {
+        "name": "wandb-metadata.json",
+        "size": 1914
+      }
+    ]
+  },
+  {
+    "id": "fgw6prw4",
+    "name": "qwen3-1p7b-gsm8k-grpo-clean",
+    "files": [
+      {
+        "name": "artifact/2877388354/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2877804540/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2878534051/wandb_manifest.json",
+        "size": 0
+      },
+      {
+        "name": "artifact/2924163861/wandb_manifest.json",
+        "size": 0
+      },
+      {
+        "name": "artifact/2924273600/wandb_manifest.json",
+        "size": 0
+      },
+      {
+        "name": "artifact/2924766788/wandb_manifest.json",
+        "size": 0
+      },
+      {
+        "name": "config.yaml",
+        "size": 10236
+      },
+      {
+        "name": "media/table/val/generations_0_d525e732a60320d55910.table.json",
+        "size": 10171
+      },
+      {
+        "name": "media/table/val/generations_399_4fb73457b5891152f88b.table.json",
+        "size": 18486
+      },
+      {
+        "name": "output.log",
+        "size": 477021
+      },
+      {
+        "name": "requirements.txt",
+        "size": 8030
+      },
+      {
+        "name": "wandb-metadata.json",
+        "size": 1916
+      },
+      {
+        "name": "wandb-summary.json",
+        "size": 3738
+      }
+    ]
+  },
+  {
+    "id": "pc68soex",
+    "name": "qwen3-1p7b-gsm8k-grpo-clean-v2",
+    "files": [
+      {
+        "name": "artifact/2929460750/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2929765561/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2930052984/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2930310262/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2930583788/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2930766882/wandb_manifest.json",
+        "size": 0
+      },
+      {
+        "name": "config.yaml",
+        "size": 10223
+      },
+      {
+        "name": "media/table/val/generations_0_78c6d7d5080e2f2b03cf.table.json",
+        "size": 10617
+      },
+      {
+        "name": "media/table/val/generations_199_d6965a8ae01a1fbde68f.table.json",
+        "size": 25846
+      },
+      {
+        "name": "media/table/val/generations_299_cdeec79c298dc05d46d2.table.json",
+        "size": 33642
+      },
+      {
+        "name": "media/table/val/generations_399_053886f00133e8cad04f.table.json",
+        "size": 40987
+      },
+      {
+        "name": "media/table/val/generations_99_11b7473b62f1fa9e1ae3.table.json",
+        "size": 18513
+      },
+      {
+        "name": "output.log",
+        "size": 1889553
+      },
+      {
+        "name": "requirements.txt",
+        "size": 8030
+      },
+      {
+        "name": "wandb-metadata.json",
+        "size": 1897
+      },
+      {
+        "name": "wandb-summary.json",
+        "size": 3716
+      }
+    ]
+  },
+  {
+    "id": "3thxksh1",
+    "name": "qwen3-1p7b-gsm8k-grpo-mixed",
+    "files": [
+      {
+        "name": "artifact/2865718480/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2866198325/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2866557212/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2866935771/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2867280068/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2867572592/wandb_manifest.json",
+        "size": 0
+      },
+      {
+        "name": "artifact/2924147523/wandb_manifest.json",
+        "size": 0
+      },
+      {
+        "name": "config.yaml",
+        "size": 10234
+      },
+      {
+        "name": "media/table/val/generations_0_e3007288f4bce997ae5a.table.json",
+        "size": 10333
+      },
+      {
+        "name": "media/table/val/generations_199_43e4b32cc5819b2f575a.table.json",
+        "size": 23645
+      },
+      {
+        "name": "media/table/val/generations_299_d18185d1c4214b1a36ff.table.json",
+        "size": 31167
+      },
+      {
+        "name": "media/table/val/generations_399_758709a8bb3d36687790.table.json",
+        "size": 38287
+      },
+      {
+        "name": "media/table/val/generations_99_1cf646c82ae302689312.table.json",
+        "size": 16959
+      },
+      {
+        "name": "output.log",
+        "size": 1888311
+      },
+      {
+        "name": "requirements.txt",
+        "size": 8030
+      },
+      {
+        "name": "wandb-metadata.json",
+        "size": 1914
+      },
+      {
+        "name": "wandb-summary.json",
+        "size": 3736
+      }
+    ]
+  },
+  {
+    "id": "3ygfhphf",
+    "name": "qwen3-1p7b-gsm8k-grpo-mixed-v2",
+    "files": [
+      {
+        "name": "artifact/2929463047/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2929758769/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2930045231/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2930305405/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2930580771/wandb_manifest.json",
+        "size": 331
+      },
+      {
+        "name": "artifact/2930758931/wandb_manifest.json",
+        "size": 0
+      },
+      {
+        "name": "config.yaml",
+        "size": 10223
+      },
+      {
+        "name": "media/table/val/generations_0_78c6d7d5080e2f2b03cf.table.json",
+        "size": 10617
+      },
+      {
+        "name": "media/table/val/generations_199_362f0a0ccafc86150255.table.json",
+        "size": 25743
+      },
+      {
+        "name": "media/table/val/generations_299_7f7ee94a277dda273934.table.json",
+        "size": 32593
+      },
+      {
+        "name": "media/table/val/generations_399_c5bb6b17febe99dfeb6b.table.json",
+        "size": 40537
+      },
+      {
+        "name": "media/table/val/generations_99_e736fa2662f31aef5c31.table.json",
+        "size": 18041
+      },
+      {
+        "name": "output.log",
+        "size": 1889895
+      },
+      {
+        "name": "requirements.txt",
+        "size": 8030
+      },
+      {
+        "name": "wandb-metadata.json",
+        "size": 1897
+      },
+      {
+        "name": "wandb-summary.json",
+        "size": 3716
+      }
+    ]
+  }
+]

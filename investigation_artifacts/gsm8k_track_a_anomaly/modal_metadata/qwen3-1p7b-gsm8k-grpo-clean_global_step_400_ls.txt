@@ -1,0 +1,2 @@
+ckpts/qwen3-1p7b-gsm8k-grpo-clean/global_step_400/actor
+ckpts/qwen3-1p7b-gsm8k-grpo-clean/global_step_400/data.pt

@@ -1,0 +1,932 @@
+{
+  "history_summaries": [
+    {
+      "label": "qwen3-1p7b-gsm8k-grpo-clean-v2__pc68soex",
+      "rows": 401,
+      "step_min": 0.0,
+      "step_max": 400.0,
+      "duplicate_steps": 0,
+      "response_length/mean": {
+        "first": 863.625,
+        "last": 664.90625,
+        "mean": 675.5797265625,
+        "min": 572.3359375,
+        "max": 937.61328125,
+        "nonnull": 400
+      },
+      "response_length/clip_ratio": {
+        "first": 0.5234375,
+        "last": 0.06640625,
+        "mean": 0.125244140625,
+        "min": 0.021484375,
+        "max": 0.654296875,
+        "nonnull": 400
+      },
+      "perf/time_per_step": {
+        "first": 75.81436231900005,
+        "last": 420.6187365540027,
+        "mean": 62.35489361716005,
+        "min": 52.11625280199951,
+        "max": 450.38922524200007,
+        "nonnull": 400
+      },
+      "timing_s/gen": {
+        "first": 33.53214521800004,
+        "last": 33.30256894699778,
+        "mean": 31.880507508572506,
+        "min": 28.964128455001628,
+        "max": 37.8019568279999,
+        "nonnull": 400
+      },
+      "timing_s/update_actor": {
+        "first": 23.51860593400005,
+        "last": 16.82894877199942,
+        "mean": 17.181073392637483,
+        "min": 14.491477240000677,
+        "max": 23.559105935999924,
+        "nonnull": 400
+      },
+      "timing_s/ref": {
+        "first": 10.12195482200002,
+        "last": 4.789526829001261,
+        "mean": 4.900607801337461,
+        "min": 4.204449615001067,
+        "max": 10.12195482200002,
+        "nonnull": 400
+      },
+      "critic/rewards/mean": {
+        "first": 0.00390625,
+        "last": 0.8671875,
+        "mean": 0.866083984375,
+        "min": 0.001953125,
+        "max": 0.970703125,
+        "nonnull": 400
+      },
+      "actor/entropy": {
+        "first": 0.1042630992108775,
+        "last": 0.150337291881442,
+        "mean": 0.1055220095383088,
+        "min": 0.0808930125832557,
+        "max": 0.1513507092992464,
+        "nonnull": 400
+      },
+      "val/openai/gsm8k/reward/mean": {
+        "first": 0.0036012130401819,
+        "last": 0.8815390447308568,
+        "mean": 0.6966262319939348,
+        "min": 0.0036012130401819,
+        "max": 0.8815390447308568,
+        "nonnull": 5
+      }
+    },
+    {
+      "label": "qwen3-1p7b-gsm8k-grpo-clean__a72jwsb8",
+      "rows": 125,
+      "step_min": 200.0,
+      "step_max": 324.0,
+      "duplicate_steps": 0,
+      "response_length/mean": {
+        "first": 934.7578125,
+        "last": 817.185546875,
+        "mean": 889.3762600806451,
+        "min": 776.65234375,
+        "max": 967.173828125,
+        "nonnull": 124
+      },
+      "response_length/clip_ratio": {
+        "first": 0.708984375,
+        "last": 0.318359375,
+        "mean": 0.5828818044354839,
+        "min": 0.263671875,
+        "max": 0.8046875,
+        "nonnull": 124
+      },
+      "perf/time_per_step": {
+        "first": 110.62520918000008,
+        "last": 86.99854662899997,
+        "mean": 102.53075226141934,
+        "min": 77.52287347499987,
+        "max": 618.8516705080001,
+        "nonnull": 124
+      },
+      "timing_s/gen": {
+        "first": 59.143550302,
+        "last": 50.82087856700127,
+        "mean": 58.876991939129105,
+        "min": 42.614149410999744,
+        "max": 66.20129702399981,
+        "nonnull": 124
+      },
+      "timing_s/update_actor": {
+        "first": 28.364751565999995,
+        "last": 22.36305037100101,
+        "mean": 24.499421382120993,
+        "min": 21.45238850699934,
+        "max": 28.364751565999995,
+        "nonnull": 124
+      },
+      "timing_s/ref": {
+        "first": 12.973938949000058,
+        "last": 7.635809258001245,
+        "mean": 8.262343892685521,
+        "min": 7.390630762000001,
+        "max": 12.973938949000058,
+        "nonnull": 124
+      },
+      "critic/rewards/mean": {
+        "first": 0.919921875,
+        "last": 0.857421875,
+        "mean": 0.9130859375,
+        "min": 0.8125,
+        "max": 0.982421875,
+        "nonnull": 124
+      },
+      "actor/entropy": {
+        "first": 0.1353185727740779,
+        "last": 0.1315712926202807,
+        "mean": 0.13998140364427572,
+        "min": 0.1184022078911463,
+        "max": 0.1628862945362925,
+        "nonnull": 124
+      },
+      "val/openai/gsm8k/reward/mean": {
+        "first": 0.8635329795299469,
+        "last": 0.8711144806671721,
+        "mean": 0.8673237300985595,
+        "min": 0.8635329795299469,
+        "max": 0.8711144806671721,
+        "nonnull": 2
+      }
+    },
+    {
+      "label": "qwen3-1p7b-gsm8k-grpo-clean__fgw6prw4",
+      "rows": 101,
+      "step_min": 300.0,
+      "step_max": 400.0,
+      "duplicate_steps": 0,
+      "response_length/mean": {
+        "first": 869.037109375,
+        "last": 703.09375,
+        "mean": 787.18720703125,
+        "min": 691.28515625,
+        "max": 887.794921875,
+        "nonnull": 100
+      },
+      "response_length/clip_ratio": {
+        "first": 0.5625,
+        "last": 0.0625,
+        "mean": 0.261875,
+        "min": 0.0546875,
+        "max": 0.5625,
+        "nonnull": 100
+      },
+      "perf/time_per_step": {
+        "first": 90.81757166,
+        "last": 512.2687478709995,
+        "mean": 75.44538444648006,
+        "min": 60.7086127120001,
+        "max": 512.2687478709995,
+        "nonnull": 100
+      },
+      "timing_s/gen": {
+        "first": 45.66809209799999,
+        "last": 31.948420845000328,
+        "mean": 37.60253465162996,
+        "min": 30.8870343640001,
+        "max": 47.63572983400013,
+        "nonnull": 100
+      },
+      "timing_s/update_actor": {
+        "first": 25.54180263299997,
+        "last": 19.17314824100049,
+        "mean": 21.538409962450018,
+        "min": 19.0158823820002,
+        "max": 25.54180263299997,
+        "nonnull": 100
+      },
+      "timing_s/ref": {
+        "first": 10.092290564999985,
+        "last": 5.3229072310005,
+        "mean": 5.9734733714299875,
+        "min": 5.292535573999885,
+        "max": 10.092290564999985,
+        "nonnull": 100
+      },
+      "critic/rewards/mean": {
+        "first": 0.8828125,
+        "last": 0.923828125,
+        "mean": 0.9216015625,
+        "min": 0.8359375,
+        "max": 0.974609375,
+        "nonnull": 100
+      },
+      "actor/entropy": {
+        "first": 0.1448792681097984,
+        "last": 0.13040136717833,
+        "mean": 0.13893455079454192,
+        "min": 0.1173890101909637,
+        "max": 0.1664662400881449,
+        "nonnull": 100
+      },
+      "val/openai/gsm8k/reward/mean": {
+        "first": 0.8711144806671721,
+        "last": 0.8750947687642153,
+        "mean": 0.8731046247156937,
+        "min": 0.8711144806671721,
+        "max": 0.8750947687642153,
+        "nonnull": 2
+      }
+    },
+    {
+      "label": "qwen3-1p7b-gsm8k-grpo-clean__go4zdpgb",
+      "rows": 241,
+      "step_min": 3.0,
+      "step_max": 243.0,
+      "duplicate_steps": 0,
+      "response_length/mean": {
+        "first": 847.20703125,
+        "last": 773.37890625,
+        "mean": 839.7167805989583,
+        "min": 722.05078125,
+        "max": 931.822265625,
+        "nonnull": 240
+      },
+      "response_length/clip_ratio": {
+        "first": 0.4921875,
+        "last": 0.265625,
+        "mean": 0.4239013671875,
+        "min": 0.134765625,
+        "max": 0.701171875,
+        "nonnull": 240
+      },
+      "perf/time_per_step": {
+        "first": 125.14243633699994,
+        "last": 95.55197128599684,
+        "mean": 117.27764506053333,
+        "min": 92.41983538799832,
+        "max": 853.1408390899996,
+        "nonnull": 240
+      },
+      "timing_s/gen": {
+        "first": 73.61084995800002,
+        "last": 57.80271211099898,
+        "mean": 70.81855517995828,
+        "min": 56.140207438998914,
+        "max": 84.08219752399964,
+        "nonnull": 240
+      },
+      "timing_s/update_actor": {
+        "first": 26.858060301000023,
+        "last": 21.66769322600157,
+        "mean": 23.138562463974914,
+        "min": 19.991221570999187,
+        "max": 26.858060301000023,
+        "nonnull": 240
+      },
+      "timing_s/ref": {
+        "first": 13.987462187999997,
+        "last": 10.224520455001766,
+        "mean": 11.137319235599884,
+        "min": 9.810689866997564,
+        "max": 13.987462187999997,
+        "nonnull": 240
+      },
+      "critic/rewards/mean": {
+        "first": 0.001953125,
+        "last": 0.875,
+        "mean": 0.8300537109375,
+        "min": 0.001953125,
+        "max": 0.962890625,
+        "nonnull": 240
+      },
+      "actor/entropy": {
+        "first": 0.106586804986,
+        "last": 0.1164567542296868,
+        "mean": 0.11072740941405339,
+        "min": 0.0866164680984285,
+        "max": 0.1457169219370811,
+        "nonnull": 240
+      },
+      "val/openai/gsm8k/reward/mean": {
+        "first": 0.0070128885519332,
+        "last": 0.8635329795299469,
+        "mean": 0.5698761688147586,
+        "min": 0.0070128885519332,
+        "max": 0.8635329795299469,
+        "nonnull": 3
+      }
+    },
+    {
+      "label": "qwen3-1p7b-gsm8k-grpo-mixed-v2__3ygfhphf",
+      "rows": 401,
+      "step_min": 0.0,
+      "step_max": 400.0,
+      "duplicate_steps": 0,
+      "response_length/mean": {
+        "first": 881.478515625,
+        "last": 674.41015625,
+        "mean": 649.6641748046875,
+        "min": 535.89453125,
+        "max": 912.998046875,
+        "nonnull": 400
+      },
+      "response_length/clip_ratio": {
+        "first": 0.546875,
+        "last": 0.078125,
+        "mean": 0.126279296875,
+        "min": 0.013671875,
+        "max": 0.619140625,
+        "nonnull": 400
+      },
+      "perf/time_per_step": {
+        "first": 77.90899749300002,
+        "last": 431.8376842039979,
+        "mean": 62.13223201368251,
+        "min": 52.58659226100008,
+        "max": 431.8376842039979,
+        "nonnull": 400
+      },
+      "timing_s/gen": {
+        "first": 34.41484174499999,
+        "last": 33.21254140800011,
+        "mean": 32.40296359628006,
+        "min": 30.38311053599955,
+        "max": 38.30509481200011,
+        "nonnull": 400
+      },
+      "timing_s/update_actor": {
+        "first": 24.04121748699993,
+        "last": 17.525133458999335,
+        "mean": 16.671392852125027,
+        "min": 14.057407150001382,
+        "max": 24.04121748699993,
+        "nonnull": 400
+      },
+      "timing_s/ref": {
+        "first": 10.589526396999986,
+        "last": 4.863806058998307,
+        "mean": 4.780594620542551,
+        "min": 4.033616195999457,
+        "max": 10.589526396999986,
+        "nonnull": 400
+      },
+      "critic/rewards/mean": {
+        "first": 0.00390625,
+        "last": 0.8828125,
+        "mean": 0.855986328125,
+        "min": 0.001953125,
+        "max": 0.978515625,
+        "nonnull": 400
+      },
+      "actor/entropy": {
+        "first": 0.1059629953195971,
+        "last": 0.1313921728481849,
+        "mean": 0.09769902836270296,
+        "min": 0.0731933970342983,
+        "max": 0.1373240705579519,
+        "nonnull": 400
+      },
+      "val/openai/gsm8k/reward/mean": {
+        "first": 0.0036012130401819,
+        "last": 0.8840030326004549,
+        "mean": 0.6970432145564821,
+        "min": 0.0036012130401819,
+        "max": 0.884950720242608,
+        "nonnull": 5
+      }
+    },
+    {
+      "label": "qwen3-1p7b-gsm8k-grpo-mixed__3thxksh1",
+      "rows": 401,
+      "step_min": 0.0,
+      "step_max": 400.0,
+      "duplicate_steps": 0,
+      "response_length/mean": {
+        "first": 882.302734375,
+        "last": 619.37109375,
+        "mean": 625.761240234375,
+        "min": 510.216796875,
+        "max": 920.017578125,
+        "nonnull": 400
+      },
+      "response_length/clip_ratio": {
+        "first": 0.55078125,
+        "last": 0.056640625,
+        "mean": 0.113896484375,
+        "min": 0.01171875,
+        "max": 0.654296875,
+        "nonnull": 400
+      },
+      "perf/time_per_step": {
+        "first": 93.46559012699991,
+        "last": 403.47796536399983,
+        "mean": 64.63219778589,
+        "min": 53.15651677400092,
+        "max": 429.2710756119996,
+        "nonnull": 400
+      },
+      "timing_s/gen": {
+        "first": 46.05611812099994,
+        "last": 31.089650272002476,
+        "mean": 33.63161867039005,
+        "min": 29.067798741001752,
+        "max": 51.46634770600008,
+        "nonnull": 400
+      },
+      "timing_s/update_actor": {
+        "first": 26.37170530100002,
+        "last": 17.66654620999907,
+        "mean": 17.71715609693497,
+        "min": 14.50522466199982,
+        "max": 26.37170530100002,
+        "nonnull": 400
+      },
+      "timing_s/ref": {
+        "first": 11.763038202999953,
+        "last": 4.761502147001011,
+        "mean": 4.92902740732503,
+        "min": 4.055612082000152,
+        "max": 11.763038202999953,
+        "nonnull": 400
+      },
+      "critic/rewards/mean": {
+        "first": 0.005859375,
+        "last": 0.88671875,
+        "mean": 0.86314453125,
+        "min": 0.005859375,
+        "max": 0.982421875,
+        "nonnull": 400
+      },
+      "actor/entropy": {
+        "first": 0.1062733277212828,
+        "last": 0.1802480298539866,
+        "mean": 0.11977669638694584,
+        "min": 0.0821580986181895,
+        "max": 0.1812449679488227,
+        "nonnull": 400
+      },
+      "val/openai/gsm8k/reward/mean": {
+        "first": 0.00303260045489,
+        "last": 0.8917740712661106,
+        "mean": 0.7004927975739196,
+        "min": 0.00303260045489,
+        "max": 0.8917740712661106,
+        "nonnull": 5
+      }
+    },
+    {
+      "label": "original_track_a_combined_by_known_resume_ids",
+      "rows": 398,
+      "step_min": 3.0,
+      "step_max": 400.0,
+      "duplicate_steps": 0,
+      "response_length/mean": {
+        "first": 847.20703125,
+        "last": 703.09375,
+        "mean": 836.6180725870253,
+        "min": 691.28515625,
+        "max": 967.173828125,
+        "nonnull": 395
+      },
+      "response_length/clip_ratio": {
+        "first": 0.4921875,
+        "last": 0.0625,
+        "mean": 0.4192790743670886,
+        "min": 0.0546875,
+        "max": 0.8046875,
+        "nonnull": 395
+      },
+      "perf/time_per_step": {
+        "first": 125.14243633699994,
+        "last": 512.2687478709995,
+        "mean": 100.21295308951645,
+        "min": 60.7086127120001,
+        "max": 764.428335685001,
+        "nonnull": 395
+      },
+      "timing_s/gen": {
+        "first": 73.61084995800002,
+        "last": 31.948420845000328,
+        "mean": 58.98903309273669,
+        "min": 30.8870343640001,
+        "max": 81.68657496199921,
+        "nonnull": 395
+      },
+      "timing_s/update_actor": {
+        "first": 26.858060301000023,
+        "last": 19.17314824100049,
+        "mean": 23.0178155461392,
+        "min": 19.0158823820002,
+        "max": 28.364751565999995,
+        "nonnull": 395
+      },
+      "timing_s/ref": {
+        "first": 13.987462187999997,
+        "last": 5.3229072310005,
+        "mean": 9.079770683045489,
+        "min": 5.292535573999885,
+        "max": 13.987462187999997,
+        "nonnull": 395
+      },
+      "critic/rewards/mean": {
+        "first": 0.001953125,
+        "last": 0.923828125,
+        "mean": 0.8663419699367089,
+        "min": 0.001953125,
+        "max": 0.982421875,
+        "nonnull": 395
+      },
+      "actor/entropy": {
+        "first": 0.106586804986,
+        "last": 0.13040136717833,
+        "mean": 0.1223029660355835,
+        "min": 0.0866164680984285,
+        "max": 0.1664662400881449,
+        "nonnull": 395
+      },
+      "val/openai/gsm8k/reward/mean": {
+        "first": 0.0070128885519332,
+        "last": 0.8750947687642153,
+        "mean": 0.6911675511751326,
+        "min": 0.0070128885519332,
+        "max": 0.8750947687642153,
+        "nonnull": 5
+      }
+    }
+  ],
+  "rollout_summaries": [
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-clean/0_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2956.7693328279,
+      "length_p50_chars": 3053.0,
+      "length_p90_chars": 3861.0,
+      "length_max_chars": 4616.0,
+      "score_mean": 0.003980288097043215,
+      "has_hash_rate": 0.2065959059893859,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-clean/100_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2525.3343442001515,
+      "length_p50_chars": 2548.0,
+      "length_p90_chars": 3353.0,
+      "length_max_chars": 4524.0,
+      "score_mean": 0.8390826383623957,
+      "has_hash_rate": 0.9177407126611069,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-clean/200_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2801.370166793025,
+      "length_p50_chars": 2869.0,
+      "length_p90_chars": 3377.0,
+      "length_max_chars": 4700.0,
+      "score_mean": 0.8635329795299469,
+      "has_hash_rate": 0.9395375284306292,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-clean/2_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2970.0274829416226,
+      "length_p50_chars": 3091.0,
+      "length_p90_chars": 3862.0,
+      "length_max_chars": 4609.0,
+      "score_mean": 0.006065200909780136,
+      "has_hash_rate": 0.20166793025018953,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-clean/300_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2669.7956785443516,
+      "length_p50_chars": 2804.0,
+      "length_p90_chars": 3353.5,
+      "length_max_chars": 4547.0,
+      "score_mean": 0.8711144806671721,
+      "has_hash_rate": 0.9482562547384382,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-clean/3_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2976.1389310083396,
+      "length_p50_chars": 3100.0,
+      "length_p90_chars": 3873.0,
+      "length_max_chars": 4639.0,
+      "score_mean": 0.007012888551933283,
+      "has_hash_rate": 0.20034116755117512,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-clean/400_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2331.0633055344956,
+      "length_p50_chars": 2247.0,
+      "length_p90_chars": 3193.0,
+      "length_max_chars": 4669.0,
+      "score_mean": 0.8750947687642153,
+      "has_hash_rate": 0.9524260803639121,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-clean-v2/0_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2956.9679681576954,
+      "length_p50_chars": 3079.0,
+      "length_p90_chars": 3848.0,
+      "length_max_chars": 4623.0,
+      "score_mean": 0.003601213040181956,
+      "has_hash_rate": 0.21398786959818045,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-clean-v2/100_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2188.7877179681577,
+      "length_p50_chars": 2075.0,
+      "length_p90_chars": 3275.0,
+      "length_max_chars": 4644.0,
+      "score_mean": 0.854814253222138,
+      "has_hash_rate": 0.923805913570887,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-clean-v2/200_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2039.2767247915087,
+      "length_p50_chars": 1918.0,
+      "length_p90_chars": 2896.0,
+      "length_max_chars": 4654.0,
+      "score_mean": 0.8678923426838514,
+      "has_hash_rate": 0.9586808188021229,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-clean-v2/300_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2022.7010993176648,
+      "length_p50_chars": 1915.0,
+      "length_p90_chars": 2863.0,
+      "length_max_chars": 4334.0,
+      "score_mean": 0.875284306292646,
+      "has_hash_rate": 0.964177407126611,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-clean-v2/400_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2097.172100075815,
+      "length_p50_chars": 2002.0,
+      "length_p90_chars": 2928.0,
+      "length_max_chars": 4494.0,
+      "score_mean": 0.8815390447308568,
+      "has_hash_rate": 0.9715693707354056,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-mixed/0_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2962.768574677786,
+      "length_p50_chars": 3111.0,
+      "length_p90_chars": 3842.5,
+      "length_max_chars": 4672.0,
+      "score_mean": 0.003032600454890068,
+      "has_hash_rate": 0.2014783927217589,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-mixed/100_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 1883.8174753601213,
+      "length_p50_chars": 1695.0,
+      "length_p90_chars": 3039.5,
+      "length_max_chars": 4658.0,
+      "score_mean": 0.8508339651250948,
+      "has_hash_rate": 0.9319560272934041,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-mixed/200_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 1714.561220621683,
+      "length_p50_chars": 1531.0,
+      "length_p90_chars": 2694.0,
+      "length_max_chars": 4524.0,
+      "score_mean": 0.8817285822592873,
+      "has_hash_rate": 0.9584912812736922,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-mixed/300_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 1986.9647460197118,
+      "length_p50_chars": 1898.5,
+      "length_p90_chars": 2920.0,
+      "length_max_chars": 4463.0,
+      "score_mean": 0.8750947687642153,
+      "has_hash_rate": 0.9636087945413192,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-mixed/400_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 1900.4871114480668,
+      "length_p50_chars": 1762.5,
+      "length_p90_chars": 2901.0,
+      "length_max_chars": 4560.0,
+      "score_mean": 0.8917740712661106,
+      "has_hash_rate": 0.9622820318423048,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-mixed-v2/0_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2956.9679681576954,
+      "length_p50_chars": 3079.0,
+      "length_p90_chars": 3848.0,
+      "length_max_chars": 4623.0,
+      "score_mean": 0.003601213040181956,
+      "has_hash_rate": 0.21398786959818045,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-mixed-v2/100_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2014.8680818802122,
+      "length_p50_chars": 1828.0,
+      "length_p90_chars": 3325.5,
+      "length_max_chars": 4589.0,
+      "score_mean": 0.8432524639878696,
+      "has_hash_rate": 0.9143290371493555,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-mixed-v2/200_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 1978.6040561031084,
+      "length_p50_chars": 1831.0,
+      "length_p90_chars": 3016.0,
+      "length_max_chars": 4483.0,
+      "score_mean": 0.8694086429112965,
+      "has_hash_rate": 0.9514783927217589,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-mixed-v2/300_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 1925.2913191811979,
+      "length_p50_chars": 1797.0,
+      "length_p90_chars": 2784.0,
+      "length_max_chars": 4477.0,
+      "score_mean": 0.884950720242608,
+      "has_hash_rate": 0.9664518574677786,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    },
+    {
+      "path": "investigation_artifacts/gsm8k_track_a_anomaly/modal_volume/qwen3-1p7b-gsm8k-grpo-mixed-v2/400_rollouts.json",
+      "samples": 5276,
+      "unique_indices": 1319,
+      "length_mean_chars": 2136.6938968915847,
+      "length_p50_chars": 2017.0,
+      "length_p90_chars": 3053.0,
+      "length_max_chars": 4500.0,
+      "score_mean": 0.8840030326004549,
+      "has_hash_rate": 0.9565959059893859,
+      "input_prefix_examples": [
+        "user\n$18 is shared among 3 boys. The eldest added $5 to his share and added another $10 the followin",
+        "user\n100 people apply for a job at Google. Of the people that apply, only 30% receive interviews. Of",
+        "user\n15 gallons of gas were equally divided into 5 different containers. Josey needed 1/4 of a conta"
+      ]
+    }
+  ],
+  "overlap_checks": [],
+  "original_track_a_combined_run_step_ranges": [
+    {
+      "_run_id": "a72jwsb8",
+      "min": 200,
+      "max": 299,
+      "count": 100
+    },
+    {
+      "_run_id": "fgw6prw4",
+      "min": 300,
+      "max": 400,
+      "count": 101
+    },
+    {
+      "_run_id": "go4zdpgb",
+      "min": 3,
+      "max": 199,
+      "count": 197
+    }
+  ]
+}
