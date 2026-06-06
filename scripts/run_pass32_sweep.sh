@@ -25,7 +25,7 @@ DATASET="gsm8k"
 N_SAMPLES=32
 MAX_RESP=1024
 OUTPUT_DIR="/data/pass32_0p6b"
-STEPS=(25 50 75 100 125 150)
+STEPS=(150)
 
 declare -A TRACK_EXP=(
   [track_a]="qwen3-0p6b-gsm8k-grpo-clean"
