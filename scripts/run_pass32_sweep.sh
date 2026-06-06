@@ -1,6 +1,8 @@
 #!/bin/bash
-# Convert every saved Qwen3-0.6B GSM8K checkpoint to HF, then run a 32-sample
-# (pass@32) GSM8K eval for each checkpoint of both tracks on Modal.
+# Run the three 32-sample GSM8K evals IN PARALLEL on separate Modal instances.
+#
+# IMPORTANT: run scripts/convert_pass32_ckpts.sh FIRST (one-off, ~4 min) so
+# the HF checkpoints exist under /data/ckpts/<exp>_hf_step150.
 #
 # Outputs land on the Modal volume 'e3-generation-vol' under /data/pass32_0p6b/:
 #   per_problem_gsm8k_<track>_step<N>.csv   (n_correct / n_samples per question)
@@ -14,53 +16,46 @@
 #   bash scripts/run_pass32_sweep.sh
 #
 # Notes:
-#   - Step 0 = base model Qwen/Qwen3-0.6B (no checkpoint); evaluated once and
-#     reused for both tracks in the notebook.
+#   - These evals are now independent; open three terminals or background
+#     them with "&" to run truly in parallel.
 #   - --max-response-length 1024 matches the training-time generation budget.
+#   - modal_eval_general.py now uses H200 for faster inference.
 
 set -euo pipefail
 
-BASE_MODEL="Qwen/Qwen3-0.6B"
 DATASET="gsm8k"
 N_SAMPLES=32
 MAX_RESP=1024
 OUTPUT_DIR="/data/pass32_0p6b"
-STEPS=(150)
 
-declare -A TRACK_EXP=(
-  [track_a]="qwen3-0p6b-gsm8k-grpo-clean"
-  [track_b]="qwen3-0p6b-gsm8k-grpo-mixed"
-)
-
-echo "=== Step 0: base model eval (shared by both tracks) ==="
+echo "=== Eval 1/3: Base model (step 0) ==="
 modal run modal_eval_general.py \
   --dataset "$DATASET" \
-  --model-path "$BASE_MODEL" \
+  --model-path "Qwen/Qwen3-0.6B" \
   --model base \
   --n-samples "$N_SAMPLES" \
   --max-response-length "$MAX_RESP" \
   --output-dir "$OUTPUT_DIR" \
   --output-tag step0
 
-for track in track_a track_b; do
-  exp="${TRACK_EXP[$track]}"
-  for step in "${STEPS[@]}"; do
-    echo "=== Convert $track ($exp) step $step ==="
-    modal run modal_convert_ckpt.py \
-      --exp-name "$exp" \
-      --step "$step" \
-      --base-model "$BASE_MODEL"
+echo "=== Eval 2/3: Track A step 150 ==="
+modal run modal_eval_general.py \
+  --dataset "$DATASET" \
+  --model-path "/data/ckpts/qwen3-0p6b-gsm8k-grpo-clean_hf_step150" \
+  --model track_a \
+  --n-samples "$N_SAMPLES" \
+  --max-response-length "$MAX_RESP" \
+  --output-dir "$OUTPUT_DIR" \
+  --output-tag step150
 
-    echo "=== Eval $track step $step (n=$N_SAMPLES) ==="
-    modal run modal_eval_general.py \
-      --dataset "$DATASET" \
-      --model-path "/data/ckpts/${exp}_hf_step${step}" \
-      --model "$track" \
-      --n-samples "$N_SAMPLES" \
-      --max-response-length "$MAX_RESP" \
-      --output-dir "$OUTPUT_DIR" \
-      --output-tag "step${step}"
-  done
-done
+echo "=== Eval 3/3: Track B step 150 ==="
+modal run modal_eval_general.py \
+  --dataset "$DATASET" \
+  --model-path "/data/ckpts/qwen3-0p6b-gsm8k-grpo-mixed_hf_step150" \
+  --model track_b \
+  --n-samples "$N_SAMPLES" \
+  --max-response-length "$MAX_RESP" \
+  --output-dir "$OUTPUT_DIR" \
+  --output-tag step150
 
-echo "=== Sweep complete. Artifacts on volume under ${OUTPUT_DIR}/ ==="
+echo "=== All evals launched. Artifacts on volume under ${OUTPUT_DIR}/ ==="

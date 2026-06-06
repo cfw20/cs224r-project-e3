@@ -445,7 +445,7 @@ def _score_outputs(dataset_key, output_path, n_samples, model_tag, tag, scorer_o
 
 @app.function(
     image=image,
-    gpu="A100-80GB",
+    gpu="H200",
     volumes={"/data": vol},
     timeout=4 * 3600,
 )
@@ -562,7 +562,8 @@ def run_eval(
     output_path = os.path.join(
         DATA_DIR, f"{dataset}_{model}_{tag}_outputs.parquet"
     )
-    batch_size = min(n_problems, 128)
+    # batch_size = min(n_problems, 128)
+    batch_size = n_problems
     _run_generation(
         data_path=data_path,
         output_path=output_path,
