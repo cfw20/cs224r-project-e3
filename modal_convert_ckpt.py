@@ -83,8 +83,9 @@ def _detect_world_size(actor_dir: str) -> int:
     volumes={"/data": vol},
     timeout=2 * 3600,
 )
-def run_convert(track: str, dataset: str, step: int, exp_name: str):
+def run_convert(track: str, dataset: str, step: int, exp_name: str, base_model: str):
     import os
+    import re
     import subprocess
 
     os.environ["HF_HOME"] = "/data/hf_cache"
@@ -110,6 +111,10 @@ def run_convert(track: str, dataset: str, step: int, exp_name: str):
         step_dir = _find_latest_step_dir(exp_dir)
     print(f"[convert] using step dir: {step_dir}")
 
+    # Resolve the concrete step number so each checkpoint gets its own HF dir.
+    m = re.search(r"global_step_(\d+)$", step_dir)
+    resolved_step = int(m.group(1)) if m else step
+
     actor_dir = os.path.join(step_dir, "actor")
     if not os.path.isdir(actor_dir):
         raise FileNotFoundError(f"Expected actor dir at {actor_dir}")
@@ -117,14 +122,14 @@ def run_convert(track: str, dataset: str, step: int, exp_name: str):
     world_size = _detect_world_size(actor_dir)
     print(f"[convert] detected world_size={world_size}")
 
-    output_path = os.path.join(CKPT_ROOT, f"{exp_name}_hf")
+    output_path = os.path.join(CKPT_ROOT, f"{exp_name}_hf_step{resolved_step}")
     os.makedirs(output_path, exist_ok=True)
 
     cmd = [
         "python3",
         os.path.join(REPO_PATH, "convert_fsdp_to_hf.py"),
         "--fsdp_checkpoint_path", actor_dir,
-        "--huggingface_model_path", BASE_MODEL,
+        "--huggingface_model_path", base_model,
         "--output_path", output_path,
         "--world_size", str(world_size),
     ]
@@ -132,12 +137,14 @@ def run_convert(track: str, dataset: str, step: int, exp_name: str):
     subprocess.run(cmd, check=True, cwd=REPO_PATH)
     vol.commit()
     print(f"[convert] HF model written to {output_path}")
-    return {"track": track, "dataset": dataset, "step_dir": step_dir, "hf_path": output_path}
+    return {"track": track, "dataset": dataset, "step": resolved_step, "step_dir": step_dir, "hf_path": output_path}
 
 
 @app.local_entrypoint()
-def main(track: str = "a", dataset: str = "gsm8k", step: int = -1, exp_name: str = ""):
+def main(track: str = "a", dataset: str = "gsm8k", step: int = -1, exp_name: str = "", base_model: str = BASE_MODEL):
     """--step=-1 means latest available global_step_* dir.
-    --exp-name converts that experiment directly, ignoring --track/--dataset."""
-    result = run_convert.remote(track=track, dataset=dataset, step=step, exp_name=exp_name)
+    --exp-name converts that experiment directly, ignoring --track/--dataset.
+    --base-model sets the HF architecture to load weights into (default Qwen/Qwen3-1.7B;
+    pass Qwen/Qwen3-0.6B for the 0.6B runs)."""
+    result = run_convert.remote(track=track, dataset=dataset, step=step, exp_name=exp_name, base_model=base_model)
     print(f"[main] done: {result}")

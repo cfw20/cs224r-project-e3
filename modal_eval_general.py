@@ -421,7 +421,7 @@ def _score_outputs(dataset_key, output_path, n_samples, model_tag, tag, scorer_o
         "extract_failures": int(extract_failures),
         "pass@1_mean": float(correctness.mean()),
     }
-    for k in (1, 4, 8, 16):
+    for k in (1, 2, 4, 8, 16, 32):
         if k <= n_samples:
             vals = [_pass_at_k(n_samples, int(correctness[i].sum()), k) for i in range(num_problems)]
             metrics[f"pass@{k}"] = float(np.mean(vals))
