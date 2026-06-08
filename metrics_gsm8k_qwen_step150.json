@@ -1,0 +1,16 @@
+{
+  "dataset": "gsm8k",
+  "model": "qwen",
+  "tag": "step150",
+  "scorer": "gsm8k_flexible",
+  "num_problems": 1319,
+  "n_samples": 32,
+  "extract_failures": 0,
+  "pass@1_mean": 0.7778146322971948,
+  "pass@1": 0.7778146322971948,
+  "pass@2": 0.8479511604588033,
+  "pass@4": 0.8889980105938619,
+  "pass@8": 0.9147280124664061,
+  "pass@16": 0.9335999511125729,
+  "pass@32": 0.9476876421531463
+}
