@@ -47,7 +47,7 @@ def run_prepare(seed: int):
 
     results = []
 
-    for mode in ("clean", "mixed", "trivia"):
+    for mode in ("clean", "mixed", "trivia", "gibberish"):
         cmd = [
             "python3", script,
             "--mode", mode,
@@ -61,6 +61,7 @@ def run_prepare(seed: int):
             "clean": "train_clean.parquet",
             "mixed": "train_mixed.parquet",
             "trivia": "train_trivia.parquet",
+            "gibberish": "train_gibberish.parquet",
         }[mode]
 
         staged_path = os.path.join(staging_dir, train_name)

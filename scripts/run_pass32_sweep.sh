@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run the three 32-sample GSM8K evals IN PARALLEL on separate Modal instances.
+# Run the four 32-sample GSM8K evals IN PARALLEL on separate Modal instances.
 #
 # IMPORTANT: run scripts/convert_pass32_ckpts.sh FIRST (one-off, ~4 min) so
 # the HF checkpoints exist under /data/ckpts/<exp>_hf_step150.
@@ -28,7 +28,7 @@ N_SAMPLES=32
 MAX_RESP=1024
 OUTPUT_DIR="/data/pass32_0p6b"
 
-echo "=== Eval 1/3: Base model (step 0) ==="
+echo "=== Eval 1/4: Base model (step 0) ==="
 modal run modal_eval_general.py \
   --dataset "$DATASET" \
   --model-path "Qwen/Qwen3-0.6B" \
@@ -38,7 +38,7 @@ modal run modal_eval_general.py \
   --output-dir "$OUTPUT_DIR" \
   --output-tag step0
 
-echo "=== Eval 2/3: Track A step 150 ==="
+echo "=== Eval 2/4: Track A step 150 ==="
 modal run modal_eval_general.py \
   --dataset "$DATASET" \
   --model-path "/data/ckpts/qwen3-0p6b-gsm8k-grpo-clean_hf_step150" \
@@ -48,11 +48,21 @@ modal run modal_eval_general.py \
   --output-dir "$OUTPUT_DIR" \
   --output-tag step150
 
-echo "=== Eval 3/3: Track B step 150 ==="
+echo "=== Eval 3/4: Track B step 150 ==="
 modal run modal_eval_general.py \
   --dataset "$DATASET" \
   --model-path "/data/ckpts/qwen3-0p6b-gsm8k-grpo-mixed_hf_step150" \
   --model track_b \
+  --n-samples "$N_SAMPLES" \
+  --max-response-length "$MAX_RESP" \
+  --output-dir "$OUTPUT_DIR" \
+  --output-tag step150
+
+echo "=== Eval 4/4: Track D step 150 ==="
+modal run modal_eval_general.py \
+  --dataset "$DATASET" \
+  --model-path "/data/ckpts/qwen3-0p6b-gsm8k-grpo-gibberish_hf_step150" \
+  --model track_d \
   --n-samples "$N_SAMPLES" \
   --max-response-length "$MAX_RESP" \
   --output-dir "$OUTPUT_DIR" \

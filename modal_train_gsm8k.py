@@ -3,9 +3,10 @@
 Modal training entrypoint for the RLAD noise-control GSM8K experiment.
 
 Runs verl GRPO on a single A100-80GB for either:
-  - track a (clean)  : uses /data/gsm8k_padded/train_clean.parquet
-  - track b (mixed)  : uses /data/gsm8k_padded/train_mixed.parquet
-  - track c (trivia) : uses /data/gsm8k_padded/train_trivia.parquet
+  - track a (clean)     : uses /data/gsm8k_padded/train_clean.parquet
+  - track b (mixed)     : uses /data/gsm8k_padded/train_mixed.parquet
+  - track c (trivia)    : uses /data/gsm8k_padded/train_trivia.parquet
+  - track d (gibberish) : uses /data/gsm8k_padded/train_gibberish.parquet
 
 All tracks share:
   - base model      Qwen/Qwen3-1.7B
@@ -16,6 +17,7 @@ Usage:
     modal run --detach modal_train_gsm8k.py --track a
     modal run --detach modal_train_gsm8k.py --track b
     modal run --detach modal_train_gsm8k.py --track c
+    modal run --detach modal_train_gsm8k.py --track d
     modal run --detach modal_train_gsm8k.py --track a --total-steps 200
 """
 
@@ -40,11 +42,13 @@ TRACK_TO_TRAIN_PARQUET = {
     "a": "train_clean.parquet",
     "b": "train_mixed.parquet",
     "c": "train_trivia.parquet",
+    "d": "train_gibberish.parquet",
 }
 TRACK_TO_FLAVOR = {
     "a": "clean",
     "b": "mixed",
     "c": "trivia",
+    "d": "gibberish",
 }
 
 # Backward-compatible names for the default 1.7B model (keeps existing runs intact).
@@ -52,6 +56,7 @@ TRACK_TO_EXP_NAME = {
     "a": "qwen3-1p7b-gsm8k-grpo-clean-v2",
     "b": "qwen3-1p7b-gsm8k-grpo-mixed-v2",
     "c": "qwen3-1p7b-gsm8k-grpo-trivia-v2",
+    "d": "qwen3-1p7b-gsm8k-grpo-gibberish-v2",
 }
 
 

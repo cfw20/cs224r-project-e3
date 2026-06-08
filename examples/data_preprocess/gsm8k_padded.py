@@ -16,21 +16,25 @@
 GSM8K preprocessor for the RLAD noise-control experiment.
 
 Modes:
-    --mode clean  : standard GSM8K train set, M rows  -> Track A
-    --mode mixed  : M originals + M fact-padded clones = 2M rows -> Track B
-    --mode trivia : M rows, ~90% fact-padded (clean only when idx % 10 == 0) -> Track C
+    --mode clean     : standard GSM8K train set, M rows  -> Track A
+    --mode mixed     : M originals + M fact-padded clones = 2M rows -> Track B
+    --mode trivia    : M rows, ~90% fact-padded (clean only when idx % 10 == 0) -> Track C
+    --mode gibberish : M originals + M gibberish-padded clones = 2M rows -> Track D
 
 The test split is always written clean (used for in-loop validation during GRPO
 and final eval).
 
 Output (under --local_dir):
-    {local_dir}/train_clean.parquet      (mode=clean)   OR
-    {local_dir}/train_mixed.parquet      (mode=mixed)   OR
-    {local_dir}/train_trivia.parquet     (mode=trivia)
+    {local_dir}/train_clean.parquet      (mode=clean)     OR
+    {local_dir}/train_mixed.parquet      (mode=mixed)     OR
+    {local_dir}/train_trivia.parquet     (mode=trivia)    OR
+    {local_dir}/train_gibberish.parquet  (mode=gibberish)
     {local_dir}/test.parquet             (always)
 
-Padded clones prepend one random trivia fact (each <=15 tokens, no numerals)
-followed by a space to the question text. Ground truth is unchanged.
+Padded clones prepend one random short string (trivia fact or gibberish, each
+<=15 tokens, no numerals) followed by a space to the question text. Ground truth
+is unchanged. Track D (gibberish) is identical in structure to Track B (mixed)
+but swaps the meaningful trivia facts for meaningless random alphabet-only tokens.
 """
 
 import argparse
@@ -67,6 +71,34 @@ TRIVIA_FACTS = [
 ]
 
 
+# 20 gibberish strings: each is 3 groups of random lowercase letters (no
+# numerals, no dictionary words, no semantic meaning). Each is well under 15
+# tokens and contains alphabet-only characters. Used by Track D as a meaningless
+# counterpart to the trivia facts in Track B.
+GIBBERISH_STRINGS = [
+    "zqwp mnvrt bjklx",
+    "ghfd slyut cmprv",
+    "xkdb nwjef tlqyr",
+    "vbmps cjrtx ghwly",
+    "qwrtp nzlfk ydjxv",
+    "bsnvm pgkrt fxzqh",
+    "mjdcl tkwrv ypnqx",
+    "lhvbg drcsf xzmkp",
+    "trjwp nylcd vqkbx",
+    "fmgzs bntjw qlxrv",
+    "pdkcl smjrv ywtqb",
+    "gxvlt bcnwm rjqsf",
+    "hskdb pzfrt vylcx",
+    "nwjqb mlgtx drcpv",
+    "xzmbl kwjfr tncvq",
+    "sldbp ytkrv gmqxj",
+    "cfnwm rjdlt vbkps",
+    "qlxzc hmjfw ntrbg",
+    "yvkpd sncbx gljrt",
+    "tmqwf xvlbn pdkrc",
+]
+
+
 def extract_solution(solution_str: str) -> str:
     solution = re.search("#### (\\-?[0-9\\.\\,]+)", solution_str)
     assert solution is not None, f"GSM8K answer regex failed on: {solution_str!r}"
@@ -95,7 +127,7 @@ def build_row(question_text: str, gt: str, split: str, idx: int, raw_answer: str
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", choices=["clean", "mixed", "trivia"], required=True)
+    parser.add_argument("--mode", choices=["clean", "mixed", "trivia", "gibberish"], required=True)
     parser.add_argument("--local_dir", default="./data_gsm8k")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
@@ -136,17 +168,20 @@ def main():
             gt = extract_solution(a)
             train_rows.append(build_row(q, gt, "train", idx, a, q))
 
-        if args.mode == "mixed":
+        if args.mode in ("mixed", "gibberish"):
+            # Track B (mixed) prepends meaningful trivia facts; Track D (gibberish)
+            # prepends meaningless random alphabet-only strings. Structure is identical.
+            pad_pool = TRIVIA_FACTS if args.mode == "mixed" else GIBBERISH_STRINGS
             M = len(train_rows)
             for idx, ex in enumerate(train_raw):
                 q = ex["question"]
                 a = ex["answer"]
                 gt = extract_solution(a)
-                fact = rng.choice(TRIVIA_FACTS)
-                padded_q = f"{fact} {q}"
+                pad = rng.choice(pad_pool)
+                padded_q = f"{pad} {q}"
                 # use a continued index so each row is unique
                 train_rows.append(build_row(padded_q, gt, "train", M + idx, a, padded_q))
-            print(f"[gsm8k_padded] mixed: kept {M} originals + {M} padded clones = {len(train_rows)}")
+            print(f"[gsm8k_padded] {args.mode}: kept {M} originals + {M} padded clones = {len(train_rows)}")
 
     # ---- Build test rows (always clean) ----
     test_rows = []
@@ -161,6 +196,7 @@ def main():
         "clean": "train_clean.parquet",
         "mixed": "train_mixed.parquet",
         "trivia": "train_trivia.parquet",
+        "gibberish": "train_gibberish.parquet",
     }[args.mode]
     train_path = os.path.join(args.local_dir, train_name)
     test_path = os.path.join(args.local_dir, "test.parquet")

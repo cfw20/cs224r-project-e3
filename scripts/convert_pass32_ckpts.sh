@@ -10,7 +10,7 @@ set -euo pipefail
 
 BASE_MODEL="Qwen/Qwen3-0.6B"
 
-for exp in qwen3-0p6b-gsm8k-grpo-clean qwen3-0p6b-gsm8k-grpo-mixed; do
+for exp in qwen3-0p6b-gsm8k-grpo-clean qwen3-0p6b-gsm8k-grpo-mixed qwen3-0p6b-gsm8k-grpo-gibberish; do
   echo "=== Converting $exp step 150 ==="
   modal run modal_convert_ckpt.py \
     --exp-name "$exp" \
