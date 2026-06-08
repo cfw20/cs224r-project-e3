@@ -5,8 +5,9 @@ Modal training entrypoint for the RLAD noise-control Hendrycks MATH experiment.
 Runs verl GRPO on a single A100-80GB for either:
   - track a (clean)  : uses /data/hendrycks_math/train_clean.parquet
   - track b (mixed)  : uses /data/hendrycks_math/train_mixed.parquet
+  - track c (trivia) : uses /data/hendrycks_math/train_trivia.parquet
 
-Both tracks share:
+All tracks share:
   - base model      Qwen/Qwen3-1.7B
   - val parquet     /data/hendrycks_math/test.parquet
   - step budget     --total-steps (default 400)
@@ -14,6 +15,7 @@ Both tracks share:
 Usage:
     modal run --detach modal_train_hendrycks.py --track a
     modal run --detach modal_train_hendrycks.py --track b
+    modal run --detach modal_train_hendrycks.py --track c
     modal run --detach modal_train_hendrycks.py --track a --total-steps 200
 """
 
@@ -37,10 +39,12 @@ BASE_MODEL = "Qwen/Qwen3-1.7B"
 TRACK_TO_TRAIN_PARQUET = {
     "a": "train_clean.parquet",
     "b": "train_mixed.parquet",
+    "c": "train_trivia.parquet",
 }
 TRACK_TO_EXP_NAME = {
     "a": "qwen3-1p7b-hendrycks-grpo-clean",
     "b": "qwen3-1p7b-hendrycks-grpo-mixed",
+    "c": "qwen3-1p7b-hendrycks-grpo-trivia",
 }
 
 

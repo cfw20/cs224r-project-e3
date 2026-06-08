@@ -35,21 +35,49 @@ DATA_DIR = "/data/gsm8k_padded"
 def run_prepare(seed: int):
     import os
     import subprocess
+    import tempfile
+    import shutil
+    import filecmp
 
     os.environ["HF_HOME"] = "/data/hf_cache"
     os.makedirs(DATA_DIR, exist_ok=True)
 
+    staging_dir = tempfile.mkdtemp(prefix="gsm8k_staging_")
     script = os.path.join(REPO_PATH, "examples/data_preprocess/gsm8k_padded.py")
+
+    results = []
 
     for mode in ("clean", "mixed", "trivia"):
         cmd = [
             "python3", script,
             "--mode", mode,
-            "--local_dir", DATA_DIR,
+            "--local_dir", staging_dir,
             "--seed", str(seed),
         ]
-        print(f"[data_upload] running: {' '.join(cmd)}")
+        print(f"[data_upload] generating: {' '.join(cmd)}")
         subprocess.run(cmd, check=True, cwd=REPO_PATH)
+
+        train_name = {
+            "clean": "train_clean.parquet",
+            "mixed": "train_mixed.parquet",
+            "trivia": "train_trivia.parquet",
+        }[mode]
+
+        staged_path = os.path.join(staging_dir, train_name)
+        vol_path = os.path.join(DATA_DIR, train_name)
+
+        if os.path.exists(vol_path):
+            if filecmp.cmp(staged_path, vol_path, shallow=False):
+                results.append(f"{train_name}: IDENTICAL (skipped)")
+                print(f"[data_upload] {train_name}: identical to Volume copy, skipping")
+            else:
+                results.append(f"{train_name}: DIFFERENT (updated)")
+                print(f"[data_upload] {train_name}: differs from Volume copy, updating")
+                shutil.copy2(staged_path, vol_path)
+        else:
+            results.append(f"{train_name}: NEW (uploaded)")
+            print(f"[data_upload] {train_name}: new file, copying to Volume")
+            shutil.copy2(staged_path, vol_path)
 
     print(f"[data_upload] listing {DATA_DIR}:")
     for name in sorted(os.listdir(DATA_DIR)):
@@ -58,7 +86,8 @@ def run_prepare(seed: int):
         print(f"  {name}  ({size} bytes)")
 
     vol.commit()
-    return {"data_dir": DATA_DIR}
+    shutil.rmtree(staging_dir)
+    return {"data_dir": DATA_DIR, "results": results}
 
 
 @app.local_entrypoint()
