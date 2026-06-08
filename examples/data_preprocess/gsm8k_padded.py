@@ -16,15 +16,17 @@
 GSM8K preprocessor for the RLAD noise-control experiment.
 
 Modes:
-    --mode clean : standard GSM8K train set, M rows  -> Track A
-    --mode mixed : M originals + M fact-padded clones = 2M rows -> Track B
+    --mode clean  : standard GSM8K train set, M rows  -> Track A
+    --mode mixed  : M originals + M fact-padded clones = 2M rows -> Track B
+    --mode trivia : M rows, ~90% fact-padded (clean only when idx % 10 == 0) -> Track C
 
 The test split is always written clean (used for in-loop validation during GRPO
 and final eval).
 
 Output (under --local_dir):
-    {local_dir}/train_clean.parquet      (mode=clean)  OR
-    {local_dir}/train_mixed.parquet      (mode=mixed)
+    {local_dir}/train_clean.parquet      (mode=clean)   OR
+    {local_dir}/train_mixed.parquet      (mode=mixed)   OR
+    {local_dir}/train_trivia.parquet     (mode=trivia)
     {local_dir}/test.parquet             (always)
 
 Padded clones prepend one random trivia fact (each <=15 tokens, no numerals)
@@ -93,7 +95,7 @@ def build_row(question_text: str, gt: str, split: str, idx: int, raw_answer: str
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", choices=["clean", "mixed"], required=True)
+    parser.add_argument("--mode", choices=["clean", "mixed", "trivia"], required=True)
     parser.add_argument("--local_dir", default="./data_gsm8k")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
@@ -109,23 +111,42 @@ def main():
 
     # ---- Build train rows ----
     train_rows = []
-    for idx, ex in enumerate(train_raw):
-        q = ex["question"]
-        a = ex["answer"]
-        gt = extract_solution(a)
-        train_rows.append(build_row(q, gt, "train", idx, a, q))
-
-    if args.mode == "mixed":
-        M = len(train_rows)
+    if args.mode == "trivia":
+        # Track C: same size as original (M rows), ~90% fact-padded.
+        # Keep clean only when idx % 10 == 0; augment everything else.
+        n_clean = 0
+        n_padded = 0
         for idx, ex in enumerate(train_raw):
             q = ex["question"]
             a = ex["answer"]
             gt = extract_solution(a)
-            fact = rng.choice(TRIVIA_FACTS)
-            padded_q = f"{fact} {q}"
-            # use a continued index so each row is unique
-            train_rows.append(build_row(padded_q, gt, "train", M + idx, a, padded_q))
-        print(f"[gsm8k_padded] mixed: kept {M} originals + {M} padded clones = {len(train_rows)}")
+            if idx % 10 == 0:
+                train_rows.append(build_row(q, gt, "train", idx, a, q))
+                n_clean += 1
+            else:
+                fact = rng.choice(TRIVIA_FACTS)
+                padded_q = f"{fact} {q}"
+                train_rows.append(build_row(padded_q, gt, "train", idx, a, padded_q))
+                n_padded += 1
+        print(f"[gsm8k_padded] trivia: {n_clean} clean + {n_padded} padded = {len(train_rows)}")
+    else:
+        for idx, ex in enumerate(train_raw):
+            q = ex["question"]
+            a = ex["answer"]
+            gt = extract_solution(a)
+            train_rows.append(build_row(q, gt, "train", idx, a, q))
+
+        if args.mode == "mixed":
+            M = len(train_rows)
+            for idx, ex in enumerate(train_raw):
+                q = ex["question"]
+                a = ex["answer"]
+                gt = extract_solution(a)
+                fact = rng.choice(TRIVIA_FACTS)
+                padded_q = f"{fact} {q}"
+                # use a continued index so each row is unique
+                train_rows.append(build_row(padded_q, gt, "train", M + idx, a, padded_q))
+            print(f"[gsm8k_padded] mixed: kept {M} originals + {M} padded clones = {len(train_rows)}")
 
     # ---- Build test rows (always clean) ----
     test_rows = []
@@ -136,7 +157,11 @@ def main():
         test_rows.append(build_row(q, gt, "test", idx, a, q))
 
     # ---- Write parquets ----
-    train_name = "train_clean.parquet" if args.mode == "clean" else "train_mixed.parquet"
+    train_name = {
+        "clean": "train_clean.parquet",
+        "mixed": "train_mixed.parquet",
+        "trivia": "train_trivia.parquet",
+    }[args.mode]
     train_path = os.path.join(args.local_dir, train_name)
     test_path = os.path.join(args.local_dir, "test.parquet")
 

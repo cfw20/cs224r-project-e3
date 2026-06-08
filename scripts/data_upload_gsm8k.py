@@ -41,7 +41,7 @@ def run_prepare(seed: int):
 
     script = os.path.join(REPO_PATH, "examples/data_preprocess/gsm8k_padded.py")
 
-    for mode in ("clean", "mixed"):
+    for mode in ("clean", "mixed", "trivia"):
         cmd = [
             "python3", script,
             "--mode", mode,

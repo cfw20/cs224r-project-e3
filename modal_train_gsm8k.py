@@ -5,8 +5,9 @@ Modal training entrypoint for the RLAD noise-control GSM8K experiment.
 Runs verl GRPO on a single A100-80GB for either:
   - track a (clean)  : uses /data/gsm8k_padded/train_clean.parquet
   - track b (mixed)  : uses /data/gsm8k_padded/train_mixed.parquet
+  - track c (trivia) : uses /data/gsm8k_padded/train_trivia.parquet
 
-Both tracks share:
+All tracks share:
   - base model      Qwen/Qwen3-1.7B
   - val parquet     /data/gsm8k_padded/test.parquet
   - step budget     --total-steps (default 400)
@@ -14,6 +15,7 @@ Both tracks share:
 Usage:
     modal run --detach modal_train_gsm8k.py --track a
     modal run --detach modal_train_gsm8k.py --track b
+    modal run --detach modal_train_gsm8k.py --track c
     modal run --detach modal_train_gsm8k.py --track a --total-steps 200
 """
 
@@ -37,16 +39,19 @@ BASE_MODEL = "Qwen/Qwen3-1.7B"
 TRACK_TO_TRAIN_PARQUET = {
     "a": "train_clean.parquet",
     "b": "train_mixed.parquet",
+    "c": "train_trivia.parquet",
 }
 TRACK_TO_FLAVOR = {
     "a": "clean",
     "b": "mixed",
+    "c": "trivia",
 }
 
 # Backward-compatible names for the default 1.7B model (keeps existing runs intact).
 TRACK_TO_EXP_NAME = {
     "a": "qwen3-1p7b-gsm8k-grpo-clean-v2",
     "b": "qwen3-1p7b-gsm8k-grpo-mixed-v2",
+    "c": "qwen3-1p7b-gsm8k-grpo-trivia-v2",
 }
 
 
